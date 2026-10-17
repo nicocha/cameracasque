@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nicocha.github.io/cameracasque/sitemap.xml

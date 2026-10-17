@@ -1,0 +1,16 @@
+# Third-party material kept locally for reference, never published:
+# the original Cambox apps, their decompiled sources, the Cambox manual and logo.
+*.apk
+*.aab
+*.ipa
+decompiled/
+app/docs/
+app/assets/icon.webp
+
+# Local tooling
+.DS_Store
+.claude/
+app/.claude/
+app/.github/modernize/
+.vscode/
+.idea/

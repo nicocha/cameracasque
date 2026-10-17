@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- full-face helmet shell: round dome, cheeks narrowing to the chin bar -->
+  <path d="M512 196 C700 196 818 340 818 520 C818 640 780 726 716 782 C690 804 660 812 628 812 L396 812 C364 812 334 804 308 782 C244 726 206 640 206 520 C206 340 324 196 512 196 Z" fill="#F2F2F7"/>
+  <!-- dome highlight -->
+  <path d="M330 330 C380 262 450 232 520 230 C450 250 392 290 356 352 Z" fill="#FFFFFF"/>
+  <!-- visor opening -->
+  <path d="M270 498 C300 440 400 414 512 414 C624 414 724 440 754 498 C768 528 762 590 742 622 C720 656 640 672 512 672 C384 672 304 656 282 622 C262 590 256 528 270 498 Z" fill="#1C1C1E"/>
+  <!-- visor reflection -->
+  <path d="M600 444 C660 450 706 468 724 494 C700 480 660 470 612 466 Z" fill="#3A3A3C"/>
+  <!-- chin vent -->
+  <rect x="452" y="726" width="120" height="22" rx="11" fill="#C7C7CC"/>
+  <!-- the camera, clipped under the visor edge: lens ringed in yellow -->
+  <rect x="422" y="374" width="180" height="92" rx="36" fill="#1C1C1E"/>
+  <circle cx="512" cy="420" r="40" fill="#FFE300"/>
+  <circle cx="512" cy="420" r="23" fill="#000000"/>
+  <circle cx="503" cy="411" r="7" fill="#FFFFFF" opacity="0.85"/>
+</svg>
