@@ -68,7 +68,7 @@ Tester sans caméra : `EXPO_PUBLIC_CAM_HOST=127.0.0.1:8099` pointe l'app vers un
 ## Site web
 
 Le site est dans `../docs/` (HTML/CSS statique), publié par GitHub Pages : Settings › Pages › *Deploy from a branch*,
-branche `main`, dossier `/docs`, à l'adresse https://nicocha.github.io/cameracasque/.
+branche `main`, dossier `/docs`, à l'adresse https://cameracasque.fr/.
 
 - Liens GitHub et APK : construits depuis `CONFIG` en tête de `docs/site.js` (dépôt `nicocha/cameracasque`).
   Renseigner `testflight` dès que l'invitation publique existe.

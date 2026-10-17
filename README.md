@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="https://nicocha.github.io/cameracasque/">Site</a> ·
+  <a href="https://cameracasque.fr/">Site</a> ·
   <a href="https://github.com/nicocha/cameracasque/releases/latest">Télécharger</a> ·
   <a href="https://github.com/nicocha/cameracasque/issues">Signaler un problème</a>
 </p>
