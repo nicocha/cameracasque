@@ -8,7 +8,7 @@
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.nicocha.cambox",
+      "bundleIdentifier": "com.nicocha.cameracasque",
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsLocalNetworking": true
@@ -19,7 +19,7 @@
       "appleTeamId": "9HHH9VUQRW"
     },
     "android": {
-      "package": "com.nicocha.cambox",
+      "package": "com.nicocha.cameracasque",
       "adaptiveIcon": {
         "backgroundColor": "#000000",
         "foregroundImage": "./assets/android-icon-foreground.png",
