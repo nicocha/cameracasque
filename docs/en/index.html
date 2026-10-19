@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Camera Casque · iPhone and Android app compatible with Cambox V3+</title>
+  <meta name="description" content="Caméra Casque is the free app compatible with Cambox V3+ that replaces the discontinued Cambox app: live view, recording, settings, and more. Available for iPhone and Android.">
+  <meta name="color-scheme" content="light dark">
+  <meta name="theme-color" content="#000000">
+  <link rel="canonical" href="https://cameracasque.fr/en/">
+  <link rel="alternate" hreflang="fr" href="https://cameracasque.fr/">
+  <link rel="alternate" hreflang="en" href="https://cameracasque.fr/en/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://cameracasque.fr/en/">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:site_name" content="Caméra Casque">
+  <meta property="og:title" content="Caméra Casque · The app for your Cambox V3+ is back">
+  <meta property="og:description" content="The free and open-source app compatible with Cambox V3+ to control your helmet camera from iPhone and Android.">
+  <meta property="og:image" content="https://cameracasque.fr/img/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Caméra Casque, the compatible app for Cambox V3+, on iPhone">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="../favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png">
+  <link rel="stylesheet" href="./styles.css?v=3">
+  <script>document.documentElement.classList.add("js")</script>
+  <script src="./site.js?v=4" defer></script>
+  <script type="application/ld+json">
+  {
+   "@context": "https://schema.org",
+   "@type": "SoftwareApplication",
+   "name": "Caméra Casque",
+   "alternateName": [
+    "Cambox V3+ app",
+    "Cambox V3+ application"
+   ],
+   "url": "https://cameracasque.fr/en/",
+   "description": "Free and open-source app compatible with the Cambox V3+ helmet camera: live preview, recording, media gallery, and camera settings over WiFi.",
+   "applicationCategory": "MultimediaApplication",
+   "operatingSystem": "iOS 16.4 or later, Android 8 or later",
+   "inLanguage": "en",
+   "isAccessibleForFree": true,
+   "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+   },
+   "featureList": [
+    "Live preview from the Cambox V3+",
+    "Remote video and photo capture",
+    "SD card gallery: save, share, delete",
+    "Camera settings (resolution, file duration, WDR, WiFi)",
+    "Built-in user guide"
+   ],
+   "screenshot": [
+    "https://cameracasque.fr/img/camera-dark.webp",
+    "https://cameracasque.fr/img/gallery-light.webp",
+    "https://cameracasque.fr/img/settings-light.webp"
+   ],
+   "image": "https://cameracasque.fr/img/icon-256.png"
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+   "@context": "https://schema.org",
+   "@type": "FAQPage",
+   "mainEntity": [
+    {
+     "@type": "Question",
+     "name": "Where can I download the Cambox V3+ app?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The official app is no longer available since Cambox shut down. Caméra Casque replaces it: free, available for iPhone and Android, and compatible with the Cambox V3+. See Install."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "The Cambox app no longer works, what should I do?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Install Caméra Casque instead. Nothing needs to be configured on the camera: join its WiFi network as before, and you get the live preview, your videos, and your settings back."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Is Caméra Casque the official Cambox app?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. It is an independent project, created by a Cambox owner for the community, with no link to Cambox Vision. It was written from scratch based on the camera’s WiFi protocol."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Is my Cambox V4 Pro or V3 compatible?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "The app is designed and tested with the Cambox V3+. Other models may use the same protocol, but nothing is guaranteed. If you try it, share the result on GitHub."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Why does the live preview pause during recording?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "While recording, the camera streams the image only in RTSP over UDP, a format iOS does not allow without a special Apple permission. The app therefore shows the preview before and after recording, and a timer during capture. Frame it, then start."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Does the app collect my data?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No. No account, no ads, no analytics. The app only communicates with your camera on its own WiFi network. It only requests photo access when you record a video."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Can I update the camera firmware?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "No, and it is not necessary: no firmware update has been released and the app works with the original firmware (V1.26A). Do not install firmware from another camera, or you risk bricking it."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "Why use TestFlight on iPhone?",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "An app that controls a product whose brand has disappeared cannot be published on the App Store by an individual. TestFlight, Apple’s beta distribution service, lets it be distributed simply and kept up to date."
+     }
+    },
+    {
+     "@type": "Question",
+     "name": "I found a bug or a missing feature.",
+     "acceptedAnswer": {
+      "@type": "Answer",
+      "text": "Open a ticket on GitHub. The code is open: contributions are welcome."
+     }
+    }
+   ]
+  }
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <header class="nav" id="top">
+    <div class="nav__inner">
+      <a class="brand" href="./" aria-label="Caméra Casque, back to top">
+        <img src="../img/icon-256.png" alt="" width="28" height="28">
+        <span>Caméra Casque <span class="brand__tag">for Cambox V3+</span></span>
+      </a>
+      <nav aria-label="Sections">
+        <ul class="nav__links">
+          <li><a href="#features">Features</a></li>
+          <li><a href="#camera">The camera</a></li>
+          <li><a href="#faq">FAQ</a></li>
+        </ul>
+      </nav>
+      <div class="nav__actions">
+        <a class="lang-toggle" href="../" data-lang-target="../" aria-label="Switch to French">FR</a>
+        <a class="btn btn--small btn--accent" href="#installer">Install</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero dark" aria-labelledby="hero-title">
+      <div class="wrap hero__grid">
+        <div class="hero__copy">
+          <p class="compat"><svg aria-hidden="true" viewBox="0 0 16 16"><path d="M4 8.3l2.5 2.5L12 5.2" /></svg>Compatible with Cambox V3+</p>
+          <h1 id="hero-title">Your Cambox&nbsp;V3+ is back in action.</h1>
+          <p class="lead">Cambox closed and its app disappeared from the App Store and Google Play. <strong>Caméra Casque</strong> takes over: the free app for live preview, recording, gallery access, and camera settings on iPhone and Android.</p>
+          <div class="cta">
+            <a class="btn btn--accent" data-link="testflight" href="https://testflight.apple.com/">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 21h14" /></svg>
+              Install on iPhone
+            </a>
+            <a class="btn btn--glass" data-link="apk" href="https://github.com/nicocha/cameracasque/releases/latest/download/camera-casque.apk">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-5-5m5 5l5-5M5 21h14" /></svg>
+              Download for Android
+            </a>
+          </div>
+          <ul class="facts" aria-label="At a glance">
+            <li>Free</li><li>No account</li><li>No ads</li><li>Open source</li>
+          </ul>
+        </div>
+        <div class="hero__visual" aria-hidden="true">
+          <div class="ring"></div>
+          <figure class="phone phone--hero">
+            <img src="../img/camera-dark.webp" alt="" width="640" height="1391" fetchpriority="high">
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="story" aria-labelledby="story-title">
+      <div class="wrap">
+        <h2 id="story-title" class="visually-hidden">Why this app exists</h2>
+        <ol class="story__steps">
+          <li class="reveal">
+            <span class="story__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" /></svg>
+            </span>
+            <h3>The official app disappeared</h3>
+            <p>With Cambox closed, the app is no longer downloadable, and new phones can’t install it anymore.</p>
+          </li>
+          <li class="reveal">
+            <span class="story__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" /><path d="M8.5 12.5l2.3 2.3 4.7-5" /></svg>
+            </span>
+            <h3>Your camera still works</h3>
+            <p>The Cambox V3+ still records. It only needed a way to be controlled from your phone.</p>
+          </li>
+          <li class="reveal">
+            <span class="story__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13.5 6l-3 12" /></svg>
+            </span>
+            <h3>Caméra Casque takes over</h3>
+            <p>An independent app, compatible with the Cambox V3+, rebuilt for iPhone and Android and released as open source to last.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="features" id="features" aria-labelledby="features-title">
+      <div class="wrap">
+        <header class="section-head reveal">
+          <p class="eyebrow eyebrow--muted">Features</p>
+          <h2 id="features-title">Everything the Cambox app did.<br>Made simpler.</h2>
+        </header>
+
+        <article class="feature reveal">
+          <figure class="phone">
+            <img src="../img/camera-dark.webp" alt="Caméra Casque camera screen: live preview of a Cambox V3+, video/photo selector, and record button" width="640" height="1391" loading="lazy">
+          </figure>
+          <div class="feature__copy">
+            <h3>Frame it live.</h3>
+            <p>See exactly what the camera is filming while you adjust the angle under your visor. Start a video or take a photo from the phone with haptic feedback on every tap.</p>
+            <ul class="ticks">
+              <li>16:9 video frame, full image in photo mode</li>
+              <li>Recording timer</li>
+              <li>Detects recordings started from the camera button</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="feature feature--flip reveal">
+          <figure class="phone">
+            <picture>
+              <source srcset="../img/gallery-dark.webp" media="(prefers-color-scheme: dark)">
+              <img src="../img/gallery-light.webp" alt="Caméra Casque gallery screen: videos and photos from the Cambox V3+ SD card" width="640" height="1391" loading="lazy">
+            </picture>
+          </figure>
+          <div class="feature__copy">
+            <h3>Your videos, just like in Photos.</h3>
+            <p>Browse the SD card in a familiar grid that shows the visible period. Swipe from one video to the next, then save, share, or delete either a single item or an entire selection.</p>
+            <ul class="ticks">
+              <li>Save directly to Photos</li>
+              <li>Duration, size, and location of each file</li>
+              <li>Multi-select and bulk delete</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="feature reveal">
+          <figure class="phone">
+            <picture>
+              <source srcset="../img/settings-dark.webp" media="(prefers-color-scheme: dark)">
+              <img src="../img/settings-light.webp" alt="Caméra Casque settings screen: Cambox V3+ settings menu, video resolution, file duration, WDR, and WiFi settings" width="640" height="1391" loading="lazy">
+            </picture>
+          </figure>
+          <div class="feature__copy">
+            <h3>Every setting in the right place.</h3>
+            <p>Resolution, file duration, WDR, exposure, white balance, auto power-off, camera name, WiFi password. The app reads the options your camera exposes and only shows the ones it accepts.</p>
+            <ul class="ticks">
+              <li>Battery level and firmware version</li>
+              <li>Automatic camera time synchronization</li>
+              <li>Format SD card and reset</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="feature feature--flip reveal">
+          <figure class="phone">
+            <picture>
+              <source srcset="../img/help-dark.webp" media="(prefers-color-scheme: dark)">
+              <img src="../img/help-light.webp" alt="Caméra Casque help screen: built-in Cambox V3+ user manual" width="640" height="1391" loading="lazy">
+            </picture>
+          </figure>
+          <div class="feature__copy">
+            <h3>The manual in your pocket.</h3>
+            <p>Buttons, lights, connection, mounting, charging, troubleshooting: the essentials of the user guide are built into the app and remain readable without a connection.</p>
+            <ul class="ticks">
+              <li>Readable even when the camera is off</li>
+              <li>Light and dark mode</li>
+              <li>No data sent to the internet</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="camera dark" id="camera" aria-labelledby="camera-title">
+      <div class="wrap">
+        <header class="section-head reveal">
+          <p class="eyebrow">The compatible camera</p>
+          <h2 id="camera-title">Cambox V3+.<br>Made for the helmet.</h2>
+          <p class="lead lead--narrow">Designed and assembled in Clisson near Nantes, the Cambox V3+ clips by velcro under the visor without drilling or modifying the shell. Its boomerang shape follows the helmet and stays nearly invisible.</p>
+        </header>
+        <dl class="specs reveal">
+          <div><dt>Video</dt><dd>2K at 30 fps<br><span>1080p and 720p at 60 fps</span></dd></div>
+          <div><dt>Lens</dt><dd>135° wide angle<br><span>Sony 10 MP sensor</span></dd></div>
+          <div><dt>Framing</dt><dd>35° tilt<br><span>From horizon to handlebars</span></dd></div>
+          <div><dt>Format</dt><dd>17.5 mm, 47 g<br><span>Compatible with 99% of helmets</span></dd></div>
+          <div><dt>Sound</dt><dd>Stereo microphone<br><span>AAC audio</span></dd></div>
+          <div><dt>Power</dt><dd>About 70 min<br><span>USB-C for an external battery</span></dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="install" id="installer" aria-labelledby="install-title">
+      <div class="wrap">
+        <header class="section-head reveal">
+          <p class="eyebrow eyebrow--muted">Install</p>
+          <h2 id="install-title">Install Caméra Casque.<br>Ready in two minutes.</h2>
+        </header>
+        <div class="cards">
+          <article class="card reveal" aria-labelledby="ios-title">
+            <h3 id="ios-title">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5" /><path d="M10.5 18.5h3" /></svg>
+              iPhone
+            </h3>
+            <p class="card__note">Via TestFlight, Apple’s app for software distributed outside the App Store. iOS 16.4 or later. Compatible with Cambox V3+.</p>
+            <ol class="steps">
+              <li>Install <strong>TestFlight</strong> from the App Store.</li>
+              <li>Open the invitation link below on your iPhone.</li>
+              <li>Tap <strong>Accept</strong>, then <strong>Install</strong>.</li>
+            </ol>
+            <a class="btn btn--accent btn--block" data-link="testflight" href="https://testflight.apple.com/">Open the TestFlight invitation</a>
+            <p class="card__fine">Updates arrive automatically through TestFlight.</p>
+          </article>
+          <article class="card reveal" aria-labelledby="android-title">
+            <h3 id="android-title">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="6.5" y="2.5" width="11" height="19" rx="2.5" /><path d="M6.5 5.5h11M6.5 18.5h11" /></svg>
+              Android
+            </h3>
+            <p class="card__note">APK file published on GitHub. Android 8 or later. Compatible with Cambox V3+.</p>
+            <ol class="steps">
+              <li>Download the APK with the button below.</li>
+              <li>Open it and allow your browser to install apps if Android asks.</li>
+              <li>Tap <strong>Install</strong>.</li>
+            </ol>
+            <a class="btn btn--accent btn--block" data-link="apk" href="https://github.com/nicocha/cameracasque/releases/latest/download/camera-casque.apk">Download the APK</a>
+            <p class="card__fine">Previous versions stay available on <a data-link="releases" href="https://github.com/nicocha/cameracasque/releases">GitHub</a>.</p>
+          </article>
+        </div>
+
+        <div class="connect reveal" aria-labelledby="connect-title">
+          <h3 id="connect-title">Then connect the camera</h3>
+          <ol class="connect__steps">
+            <li><strong>Power it on</strong><span>Hold the On/Off button for 3 seconds. It vibrates: it is on standby.</span></li>
+            <li><strong>Enable WiFi</strong><span>Short press the WiFi button. The orange LED blinks quickly.</span></li>
+            <li><strong>Join its network</strong><span>In your phone’s WiFi settings: <code>CAMBOXV3PLUS</code>, password <code>12345678</code>.</span></li>
+            <li><strong>Open the app</strong><span>The orange light becomes steady. The live preview appears.</span></li>
+          </ol>
+          <p class="connect__note">The phone tells you the network has no internet access? Choose to stay connected. On Android, turn off mobile data if the app does not find the camera.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="faq" id="faq" aria-labelledby="faq-title">
+      <div class="wrap wrap--narrow">
+        <header class="section-head reveal">
+          <p class="eyebrow eyebrow--muted">Frequently asked questions</p>
+          <h2 id="faq-title">Good to know.</h2>
+        </header>
+        <div class="qa reveal">
+          <details>
+            <summary>Where can I download the Cambox V3+ app?</summary>
+            <p>The official app is no longer available since Cambox shut down. Caméra Casque replaces it: free, available on iPhone and Android, and compatible with the Cambox V3+. See <a href="#installer">Install</a>.</p>
+          </details>
+          <details>
+            <summary>The Cambox app no longer works, what should I do?</summary>
+            <p>Install Caméra Casque instead. Nothing needs to be configured on the camera: join its WiFi network as before, and you get the live preview, your videos, and your settings back.</p>
+          </details>
+          <details>
+            <summary>Is Caméra Casque the official Cambox app?</summary>
+            <p>No. It is an independent project created by a Cambox owner for the community, with no link to Cambox Vision. It was rewritten from scratch based on the camera’s WiFi protocol.</p>
+          </details>
+          <details>
+            <summary>Is my Cambox V4 Pro or V3 compatible?</summary>
+            <p>The app is designed and tested with the Cambox V3+. Other models may use the same protocol, but nothing is guaranteed. If you try it, share the result on <a data-link="issues" href="https://github.com/nicocha/cameracasque/issues">GitHub</a>.</p>
+          </details>
+          <details>
+            <summary>Why does the live preview pause during recording?</summary>
+            <p>While recording, the camera only streams the image in RTSP over UDP, a format iOS does not allow without a special Apple permission. The app therefore shows the preview before and after recording, and a timer during capture. Frame it, then start.</p>
+          </details>
+          <details>
+            <summary>Does the app collect my data?</summary>
+            <p>No. No account, no ads, no analytics. The app only communicates with your camera on its own WiFi network. It only requests photo access when you record a video.</p>
+          </details>
+          <details>
+            <summary>Can I update the camera firmware?</summary>
+            <p>No, and it is not necessary: no update has been published and the app works with the original firmware (V1.26A). Do not install firmware from another camera, or you risk bricking it.</p>
+          </details>
+          <details>
+            <summary>Why use TestFlight on iPhone?</summary>
+            <p>An app that controls a product whose brand has disappeared cannot be published on the App Store by an individual. TestFlight, Apple’s beta distribution service, lets it be distributed simply and kept up to date.</p>
+          </details>
+          <details>
+            <summary>I found a bug or a missing feature.</summary>
+            <p>Open a ticket on <a data-link="issues" href="https://github.com/nicocha/cameracasque/issues">GitHub</a>. The code is open: contributions are welcome.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer__inner">
+      <div class="footer__brand">
+        <img src="../img/icon-256.png" alt="" width="40" height="40">
+        <p><strong>Caméra Casque</strong><br>Compatible with Cambox V3+. Free, open, and ad-free.</p>
+      </div>
+      <nav aria-label="Project links">
+        <ul class="footer__links">
+          <li><a data-link="repo" href="https://github.com/nicocha/cameracasque">Source code</a></li>
+          <li><a data-link="releases" href="https://github.com/nicocha/cameracasque/releases">Releases</a></li>
+          <li><a data-link="issues" href="https://github.com/nicocha/cameracasque/issues">Report a problem</a></li>
+          <li><a href="privacy.html">Privacy</a></li>
+        </ul>
+      </nav>
+      <p class="legal">Caméra Casque is an independent project, not affiliated with Cambox Vision and not approved by it. Cambox® is a trademark of Cambox Vision, cited only to indicate compatibility. iPhone, App Store, and TestFlight are trademarks of Apple Inc. Android and Google Play are trademarks of Google LLC. App screenshots are demo captures.</p>
+    </div>
+  </footer>
+</body>
+</html>
