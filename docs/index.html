@@ -8,6 +8,8 @@
   <meta name="color-scheme" content="light dark">
   <meta name="theme-color" content="#000000">
   <link rel="canonical" href="https://cameracasque.fr/">
+  <link rel="alternate" hreflang="fr" href="https://cameracasque.fr/">
+  <link rel="alternate" hreflang="en" href="https://cameracasque.fr/en/">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://cameracasque.fr/">
   <meta property="og:locale" content="fr_FR">
@@ -156,7 +158,10 @@
           <li><a href="#faq">FAQ</a></li>
         </ul>
       </nav>
-      <a class="btn btn--small btn--accent" href="#installer">Installer</a>
+      <div class="nav__actions">
+        <a class="lang-toggle" href="en/" data-lang-target="en/" aria-label="Passer à l’anglais">EN</a>
+        <a class="btn btn--small btn--accent" href="#installer">Installer</a>
+      </div>
     </div>
   </header>
 
@@ -427,9 +432,9 @@
       </div>
       <nav aria-label="Liens du projet">
         <ul class="footer__links">
-          <li><a data-link="repo" href="#top">Code source</a></li>
-          <li><a data-link="releases" href="#top">Versions</a></li>
-          <li><a data-link="issues" href="#top">Signaler un problème</a></li>
+          <li><a data-link="repo" href="https://github.com/nicocha/cameracasque">Code source</a></li>
+          <li><a data-link="releases" href="https://github.com/nicocha/cameracasque/releases">Versions</a></li>
+          <li><a data-link="issues" href="https://github.com/nicocha/cameracasque/issues">Signaler un problème</a></li>
           <li><a href="confidentialite.html">Confidentialité</a></li>
         </ul>
       </nav>
