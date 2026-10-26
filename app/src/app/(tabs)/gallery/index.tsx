@@ -139,8 +139,8 @@ export default function GalleryScreen() {
         else Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     };
 
-    // No title without a camera; the early states restore it (the main view sets its own).
-    const header = <Stack.Screen options={{ title: online ? "Gallerie" : "", headerLargeTitleEnabled: !!online }} />;
+    // No title without a camera (no bar at all on Android, level with the Camera tab); the early states restore it (the main view sets its own).
+    const header = <Stack.Screen options={{ title: online ? "Gallerie" : "", headerLargeTitleEnabled: !!online, headerShown: !!online || Platform.OS === "ios" }} />;
     if (!online) return <>{header}<NotConnected /></>;
     if (recording)
         return (

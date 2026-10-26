@@ -59,8 +59,8 @@ export default function SettingsScreen() {
     if (online) refresh();
   }, [online, refresh]));
 
-  // No title without a camera.
-  const header = <Stack.Screen options={{ title: online ? 'Réglages' : '', headerLargeTitleEnabled: !!online }} />;
+  // No title without a camera; no bar at all on Android, so the message sits level with the Camera tab's.
+  const header = <Stack.Screen options={{ title: online ? 'Réglages' : '', headerLargeTitleEnabled: !!online, headerShown: !!online || Platform.OS === 'ios' }} />;
   if (!online) return <>{header}<HelpButton /><NotConnected /></>;
   if (recording)
     return <>{header}<HelpButton /><Unavailable symbol={{ ios: 'record.circle', android: 'fiber_manual_record' }} title="Enregistrement en cours" message="Arrêtez l’enregistrement dans l’onglet Caméra pour modifier les réglages." /></>;
