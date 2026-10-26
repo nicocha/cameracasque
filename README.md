@@ -64,7 +64,7 @@ Builds de production et publication sur les stores : EAS (`app/eas.json`), déta
 ## Contribuer
 
 Les tickets et les pull requests sont les bienvenus. Avant d’envoyer une modification :
-`npx tsc --noEmit` et `node camera.check.ts` dans `app/`.
+`npx tsc --noEmit` et `node src/camera.check.ts` dans `app/`.
 
 ## Licence et marques
 

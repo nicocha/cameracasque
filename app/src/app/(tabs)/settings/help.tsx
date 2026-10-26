@@ -3,9 +3,9 @@ import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-na
 import { Stack } from 'expo-router';
 import Constants from 'expo-constants';
 import { SymbolView, SymbolViewProps } from 'expo-symbols';
-import { HELP_V3, HELP_V4 } from '../../../../help';
-import { v4 } from '../../../../camera4';
-import { useCamera, useColors } from '../../../../shared';
+import { HELP_V3, HELP_V4 } from '../../../help';
+import { v4 } from '../../../camera4';
+import { useCamera, useColors } from '../../../shared';
 
 const SITE = 'https://www.cameracasque.fr';
 

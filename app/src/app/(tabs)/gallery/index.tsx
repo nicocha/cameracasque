@@ -15,9 +15,9 @@ import { Stack, useFocusEffect, useRouter } from "expo-router";
 import { setStatusBarStyle } from "expo-status-bar";
 import { SymbolView } from "expo-symbols";
 import * as Haptics from "expo-haptics";
-import { CamFile, dateRange, formatCamTime as formatDate, parseCamTime } from "../../../../camera";
-import { browsing, DENIED_MSG, photosAllowed, saveToPhotos, share, videoThumb } from "../../../../media";
-import { NotConnected, Unavailable, useCamera, useColors } from "../../../../shared";
+import { CamFile, dateRange, formatCamTime as formatDate, parseCamTime } from "../../../camera";
+import { browsing, DENIED_MSG, photosAllowed, saveToPhotos, share, videoThumb } from "../../../media";
+import { NotConnected, Unavailable, useCamera, useColors } from "../../../shared";
 
 const errMsg = (e: unknown) => (e instanceof Error ? e.message : String(e));
 const plural = (n: number, word: string) => `${n} ${word}${n > 1 ? "s" : ""}`;

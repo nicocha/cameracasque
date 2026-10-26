@@ -6,9 +6,9 @@ import { SymbolView } from 'expo-symbols';
 import * as Haptics from 'expo-haptics';
 import { useEventListener } from 'expo';
 import { useVideoPlayer, VideoView } from 'expo-video';
-import { CamFile, formatCamTime } from '../../camera';
-import { browsing, cachedThumb, DENIED_MSG, photosAllowed, saveToPhotos, share } from '../../media';
-import { useCamera } from '../../shared';
+import { CamFile, formatCamTime } from '../camera';
+import { browsing, cachedThumb, DENIED_MSG, photosAllowed, saveToPhotos, share } from '../media';
+import { useCamera } from '../shared';
 
 // Always dark, like Photos' full-screen viewer and the Camera app: video letterboxing is black, so a light
 // background around it left white bands above and below.

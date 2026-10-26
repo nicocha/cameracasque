@@ -1,7 +1,7 @@
 import { useColorScheme } from "react-native";
 import { DarkTheme, DefaultTheme, ThemeProvider } from "expo-router";
 import { Stack } from "expo-router/stack";
-import { CameraProvider, useColors } from "../../shared";
+import { CameraProvider, useColors } from "../shared";
 
 // Without a theme, navigation uses its light one in Dark Mode too: black titles, white bars.
 // `card: transparent` leaves the bars to the system (Liquid Glass + scroll edge effect) instead of an opaque fill.
