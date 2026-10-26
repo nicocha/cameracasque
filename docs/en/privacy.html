@@ -3,15 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Privacy · Caméra Casque, app compatible with Cambox V3+</title>
-  <meta name="description" content="Privacy policy of Caméra Casque, the app compatible with Cambox V3+: no personal data collected.">
+  <title>Privacy · Caméra Casque, app compatible with Cambox V3+ and V4</title>
+  <meta name="description" content="Privacy policy of Caméra Casque, the app compatible with Cambox V3+ and V4: no data collected.">
   <meta name="color-scheme" content="light dark">
   <link rel="canonical" href="https://cameracasque.fr/en/privacy.html">
   <link rel="alternate" hreflang="fr" href="https://cameracasque.fr/confidentialite.html">
   <link rel="alternate" hreflang="en" href="https://cameracasque.fr/en/privacy.html">
   <link rel="icon" href="../favicon.png" type="image/png">
-  <link rel="stylesheet" href="./styles.css?v=3">
-  <script>document.documentElement.classList.add("js")</script>
+  <link rel="stylesheet" href="./styles.css?v=6">
   <style>
     .policy { background: var(--bg); padding: calc(56px + 64px) 0 96px; }
     .policy h1 { font-size: clamp(36px, 5vw, 52px); }
@@ -27,10 +26,10 @@
     <div class="nav__inner">
       <a class="brand" href="./" aria-label="Caméra Casque, home">
         <img src="../img/icon-256.png" alt="" width="28" height="28">
-        <span>Caméra Casque <span class="brand__tag">for Cambox V3+</span></span>
+        <span>Caméra Casque <span class="brand__tag">for Cambox V3+ and V4</span></span>
       </a>
       <div class="nav__actions">
-        <a class="lang-toggle" href="../confidentialite.html" data-lang-target="../confidentialite.html" aria-label="Switch to French">FR</a>
+        <a class="lang-toggle" href="../confidentialite.html" data-lang-target="../confidentialite.html" aria-label="Passer en français">FR</a>
       </div>
     </div>
   </header>
@@ -38,39 +37,40 @@
   <main class="policy">
     <div class="wrap wrap--narrow">
       <h1>Privacy</h1>
-      <p class="updated">Last updated: 17 October 2026</p>
+      <p class="updated">Last updated: October 26, 2026</p>
 
-      <h2>Summary</h2>
-      <p>Caméra Casque, the app compatible with the Cambox V3+, does not collect, store, or transmit any personal data. It has no account system, no ads, and no analytics or tracking tools.</p>
+      <h2>In short</h2>
+      <p>Caméra Casque, the app compatible with Cambox V3+ and V4, does not collect, store or transmit any personal data. It has no account, no ads and no analytics or tracking tools.</p>
 
       <h2>Network communication</h2>
-      <p>The app communicates only with your Cambox camera on the local WiFi network it creates (address 192.168.1.254). It sends no requests to the internet or to any third-party server.</p>
+      <p>The app only communicates with your Cambox camera, on the local WiFi network the camera creates (address 192.168.1.254 for the V3+, 192.168.2.1 for the V4). It sends no request to the internet or to any third-party server.</p>
 
       <h2>Photos and videos</h2>
-      <p>When you tap “Save”, the app downloads the video or photo from the camera and adds it to your phone’s photo library. To do this, it requests “Add only” access: it does not read or browse your existing photos.</p>
-      <p>When you tap “Share”, the file is prepared in a temporary app folder and passed to the app you choose. It is deleted afterward.</p>
+      <p>When you tap “Save”, the app downloads the video or photo from the camera and adds it to your phone’s gallery. For this it asks for add-only access: it does not read or browse your existing photos.</p>
+      <p>When you tap “Share”, the file is prepared in a temporary folder of the app, then handed to the app you choose. It is deleted afterwards.</p>
 
       <h2>Permissions requested</h2>
       <ul>
         <li><strong>Local network</strong> (iPhone): connect to the camera.</li>
-        <li><strong>Add to Photos / Gallery</strong>: save files from the camera only when you ask for it.</li>
+        <li><strong>Add to Photos / to the gallery</strong>: save the camera’s files, only when you ask.</li>
       </ul>
 
       <h2>Children</h2>
       <p>The app collects no data, including from children.</p>
 
       <h2>Source code</h2>
-      <p>The app code is public: anyone can verify what it does. <a data-link="repo" href="https://github.com/nicocha/cameracasque">View the source code</a>.</p>
+      <p>The app’s code is public: anyone can check what it does. <a data-link="repo" href="https://github.com/nicocha/cameracasque">See the source code</a>.</p>
 
       <h2>Contact</h2>
-      <p>For any question, open a ticket on <a data-link="issues" href="https://github.com/nicocha/cameracasque/issues">GitHub</a>.</p>
+      <p>For any question, open an issue on <a data-link="issues" href="https://github.com/nicocha/cameracasque/issues">GitHub</a>.</p>
     </div>
   </main>
 
   <footer class="footer">
     <div class="wrap">
-      <p class="legal">Caméra Casque is an independent project, not affiliated with Cambox Vision and not approved by it. Cambox® is a trademark of Cambox Vision, cited only to indicate compatibility.</p>
+      <p class="legal">Caméra Casque is an independent project, not affiliated with or endorsed by Cambox Vision. Cambox® is a trademark of Cambox Vision, mentioned only to indicate compatibility.</p>
     </div>
   </footer>
+  <script src="./site.js?v=4" defer></script>
 </body>
 </html>
