@@ -7,8 +7,8 @@ import { useFocusEffect } from 'expo-router';
 import { setStatusBarStyle } from 'expo-status-bar';
 import * as Haptics from 'expo-haptics';
 import { VLCPlayer } from 'react-native-vlc-media-player';
-import { MODE } from '../../camera';
-import { NotConnected, useCamera } from '../../shared';
+import { MODE } from '../../../camera';
+import { NotConnected, useCamera } from '../../../shared';
 
 // The camera leaves preview mode to record (see each driver's `live`): no preview while recording.
 const YELLOW = '#ffd60a'; // Camera app's selected-mode color

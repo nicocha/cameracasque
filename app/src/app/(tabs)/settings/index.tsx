@@ -2,9 +2,9 @@ import { useCallback, useState } from 'react';
 import { Alert, Modal, Platform, Pressable, StyleSheet, Text as RNText, TextInput, View } from 'react-native';
 import { Stack, useFocusEffect, useRouter } from 'expo-router';
 import { setStatusBarStyle } from 'expo-status-bar';
-import SettingsForm from '../../../components/SettingsForm';
-import { dedupe, Section, Setting, validPassword, validSsid } from '../../../camera';
-import { NotConnected, Unavailable, useCamera, useColors } from '../../../shared';
+import SettingsForm from '../../../../components/SettingsForm';
+import { dedupe, Section, Setting, validPassword, validSsid } from '../../../../camera';
+import { NotConnected, Unavailable, useCamera, useColors } from '../../../../shared';
 
 const errMsg = (e: unknown) => (e instanceof Error ? e.message : String(e));
 const hint = (it: { action: string; max?: number }) =>

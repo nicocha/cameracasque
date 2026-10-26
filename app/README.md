@@ -61,7 +61,7 @@ Live : `http://192.168.1.254:8192` (MJPEG, mode photo uniquement). Le RTSP du mo
 - `media.ts` — téléchargement vers Photos et partage
 - `help.ts` — contenu de l'aide, réécrit d'après les manuels Cambox V3+, V4 et V4 Pro (non redistribués, `docs/` est ignoré par git)
 - `shared.tsx` — état de connexion, couleurs clair/sombre, écran « contenu indisponible »
-- `app/` — écrans (expo-router) : pile racine (`_layout.tsx`) avec le visualiseur `view.tsx` en plein écran au-dessus des onglets natifs `(tabs)/` : `index.tsx` Caméra, `gallery/`, `settings/` (dont `help.tsx`)
+- `src/app/` — écrans (expo-router) : pile racine (`_layout.tsx`) avec le visualiseur `view.tsx` en plein écran au-dessus des onglets natifs `(tabs)/` : `index.tsx` Caméra, `gallery/`, `settings/` (dont `help.tsx`)
 
 Test du parseur : `node camera.check.ts`.
 Tester sans caméra : `EXPO_PUBLIC_CAM_HOST=127.0.0.1:8099` pointe l'app vers un faux serveur.
