@@ -39,7 +39,7 @@ toujours. Caméra Casque est une app indépendante, écrite de zéro à partir d
 
 | | |
 |---|---|
-| Caméra | Cambox V3+ (firmware V1.26A testé). Autres modèles non testés |
+| Caméra | Cambox V3+ (firmware V1.26A testé), Cambox V4 / V4 Plus / V4 Pro (V4 Pro firmware 1.2.7 testé) |
 | iPhone | iOS 16.4 ou plus récent |
 | Android | Android 8 ou plus récent |
 

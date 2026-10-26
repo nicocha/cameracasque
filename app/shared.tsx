@@ -3,33 +3,43 @@ import { Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native'
 import { router } from 'expo-router';
 import { SymbolView, SymbolViewProps } from 'expo-symbols';
 import TcpSocket from 'react-native-tcp-socket';
-import { cam, EVENT, Option, NOTIFY, parseStatus, STATUS } from './camera';
+import { batteryLabel, Driver, EVENT, Option, NOTIFY, parseStatus, STATUS, v3 } from './camera';
+import { v4 } from './camera4';
 
 const HEARTBEAT_MS = 10000;
 
 type CameraState = {
   online: boolean | null;
+  driver: Driver; // the model that answered; V3+ until one does
   model: string[];
   recording: boolean;
-  battery: number | null;
+  battery: string;
   menu: Record<string, Option[]>;
   setRecording: (r: boolean) => void;
 };
 
-const Ctx = createContext<CameraState>({ online: null, model: [], recording: false, battery: null, menu: {}, setRecording: () => {} });
+const Ctx = createContext<CameraState>({ online: null, driver: v3, model: [], recording: false, battery: '—', menu: {}, setRecording: () => {} });
 export const useCamera = () => useContext(Ctx);
+
+// The phone is on one camera's WiFi: ask both models, keep the one that answers.
+const detect = async () => {
+  const [a, b] = await Promise.all([v3.heartbeat(), v4.heartbeat()]);
+  return a ? v3 : b ? v4 : null;
+};
 
 export function CameraProvider({ children }: { children: ReactNode }) {
   const [online, setOnline] = useState<boolean | null>(null);
+  const [driver, setDriver] = useState<Driver>(v3);
   const [model, setModel] = useState<string[]>([]);
   const [recording, setRecording] = useState(false);
-  const [battery, setBattery] = useState<number | null>(null);
+  const [battery, setBattery] = useState('—');
   const [menu, setMenu] = useState<Record<string, Option[]>>({});
 
-  // Like the original app: HTTP heartbeat + a TCP notification socket the camera expects to stay open
-  // (without it the camera drops the WiFi client after a while). On each (re)connection: model + clock.
+  // V3+, like the original app: HTTP heartbeat + a TCP notification socket the camera expects to stay open
+  // (without it the camera drops the WiFi client after a while). V4: heartbeat + recording state polled.
+  // On each (re)connection: model, clock, battery, menu.
   useEffect(() => {
-    let wasOnline = false;
+    let current: Driver | null = null;
     let sock: ReturnType<typeof TcpSocket.createConnection> | null = null;
 
     const openSocket = () => {
@@ -38,35 +48,34 @@ export function CameraProvider({ children }: { children: ReactNode }) {
         const ev = parseStatus(String(data));
         if (ev[EVENT.status] === STATUS.recStarted || ev[EVENT.recTime] !== undefined) setRecording(true);
         if (ev[EVENT.status] === STATUS.recStopped) setRecording(false);
-        if (ev[EVENT.battery] !== undefined && ev[EVENT.battery] !== -1) setBattery(ev[EVENT.battery]);
+        if (ev[EVENT.battery] !== undefined && ev[EVENT.battery] !== -1) setBattery(batteryLabel(ev[EVENT.battery]));
       });
       sock.on('error', () => {});
       sock.on('close', () => { sock = null; });
     };
 
     const tick = async () => {
-      const ok = await cam.heartbeat();
-      setOnline(ok);
-      if (ok && !wasOnline) {
-        cam.model().then(setModel, () => {});
-        cam.syncClock().catch(() => {});
-        cam.battery().then(setBattery, () => {});
-        cam.menu().then(setMenu, () => {});
+      const d = current && (await current.heartbeat()) ? current : await detect();
+      setOnline(!!d);
+      if (d && d !== current) {
+        setDriver(d);
+        d.connect().then((info) => { setModel(info.model); setBattery(info.battery); setMenu(info.menu); }, () => {});
       }
-      if (ok && !sock) openSocket();
-      if (!ok) {
-        setRecording(false);
+      if (d === v3 && !sock) openSocket();
+      if (d?.isRecording) d.isRecording().then(setRecording, () => {});
+      if (d !== v3) {
         sock?.destroy();
         sock = null;
       }
-      wasOnline = ok;
+      if (!d) setRecording(false);
+      current = d;
     };
     tick();
     const id = setInterval(tick, HEARTBEAT_MS);
     return () => { clearInterval(id); sock?.destroy(); };
   }, []);
 
-  return <Ctx.Provider value={{ online, model, recording, battery, menu, setRecording }}>{children}</Ctx.Provider>;
+  return <Ctx.Provider value={{ online, driver, model, recording, battery, menu, setRecording }}>{children}</Ctx.Provider>;
 }
 
 // iOS semantic colors (systemBackground, label, secondaryLabel, separator), light and dark.

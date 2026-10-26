@@ -33,3 +33,26 @@ assert.equal(dateRange(d('2026/10/17 09:00:00'), d('2026/10/12 18:00:00')), '12 
 assert.equal(dateRange(d('2026/09/28 09:00:00'), d('2026/10/03 18:00:00')), '28 sept. – 3 oct. 2026');
 assert.equal(dateRange(d('2025/12/30 09:00:00'), d('2026/01/02 18:00:00')), '30 déc. 2025 – 2 janv. 2026');
 console.log('ok');
+
+// Cambox V4 (camera4.ts)
+const { parseKv, parseListing, batteryV4, sectionsV4, oldFirmware } = await import('./camera4.ts');
+assert(!oldFirmware('1.2.7') && !oldFirmware('1.21') && oldFirmware('1.19'));
+assert.deepEqual(parseKv('version=1.21;model=cbv4plus;'), { version: '1.21', model: 'cbv4plus' });
+assert.deepEqual(parseKv('NOK'), {});
+// lighttpd mod_dirlisting rows
+const files4 = parseListing(`<table><tr class="d"><td class="n"><a href="../">..</a>/</td><td class="m">&nbsp;</td><td class="s">- &nbsp;</td><td class="t">Directory</td></tr>
+<tr><td class="n"><a href="VID_0001.MOV">VID_0001.MOV</a></td><td class="m">2026-Oct-24 09:05:00</td><td class="s">512.5M</td><td class="t">video/quicktime</td></tr></table>`);
+assert.equal(files4.length, 1);
+assert.equal(files4[0].time, '2026/10/24 09:05:00');
+assert.equal(files4[0].path, '100CAMBX/VID_0001.MOV');
+assert.equal(files4[0].url, 'http://192.168.2.1/data/100CAMBX/VID_0001.MOV');
+assert.equal(files4[0].size, Math.round(512.5 * 1024 ** 2));
+assert.ok(files4[0].isVideo && files4[0].thumb === '');
+assert.equal(batteryV4(4100), '100 % (4,10 V)');
+assert.equal(batteryV4(3600), '50 % (3,60 V)');
+const res4 = (m: string) => sectionsV4(m)[0].items[0];
+assert.ok('options' in res4('cbv4') && !res4('cbv4').options.some((o) => o.label.startsWith('4K')));
+assert.ok('options' in res4('cbv4pro') && res4('cbv4pro').options[0].label === '4K 30 i/s');
+const odd = sectionsV4('cbv4pro', { resolution: '2', framerate: '1' })[0].items[0];
+assert.ok('options' in odd && odd.options.at(-1)!.label === '720p 120 i/s'); // unknown combo stays selectable
+console.log('ok v4');

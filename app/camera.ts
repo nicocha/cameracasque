@@ -112,12 +112,91 @@ export const cam = {
   },
 };
 
+/** What the screens need from a camera model. V3+ is below, V4 in camera4.ts. */
+export type Driver = {
+  name: string; // "Cambox V3+", "Cambox V4"
+  heartbeat: () => Promise<boolean>;
+  /** On each (re)connection: model strings, battery label, firmware menu; also sets the clock. */
+  connect: () => Promise<{ model: string[]; battery: string; menu: Record<string, Option[]> }>;
+  /** Polled with the heartbeat when the camera has no notification socket. */
+  isRecording?: () => Promise<boolean>;
+  live: { url: string; vlcOptions: string[]; photo: boolean };
+  /** Puts the camera in preview mode; returns false if `cancelled()` turned true meanwhile. */
+  prepareLive: (cancelled: () => boolean) => Promise<boolean>;
+  /** Preview switched off: lets the camera stop its stream (V4). */
+  stopLive?: () => Promise<unknown>;
+  startRecording: () => Promise<void>;
+  stopRecording: () => Promise<unknown>;
+  snapshot: () => Promise<unknown>;
+  files: () => Promise<CamFile[]>;
+  deleteFile: (f: CamFile) => Promise<unknown>;
+  values: () => Promise<Record<string, number>>;
+  apply: (cmd: number, opts: { par?: number; str?: string }) => Promise<unknown>;
+  wifi: () => Promise<{ ssid?: string; password?: string }>;
+  sections: (model: string[], menu: Record<string, Option[]>) => Section[];
+  firmware: (model: string[]) => string;
+};
+
+// The camera needs a moment after a mode change before its stream server answers (the original app waits 1 s).
+const MODE_SETTLE_MS = 1200;
+const RECORDING_GRACE_MS = 3000;
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+export const v3: Driver = {
+  name: 'Cambox V3+',
+  heartbeat: cam.heartbeat,
+  connect: async () => {
+    cam.syncClock().catch(() => {});
+    const [model, battery, menu] = await Promise.all([
+      cam.model().catch(() => []),
+      cam.battery().then(batteryLabel, () => batteryLabel(null)),
+      cam.menu().catch(() => ({})),
+    ]);
+    return { model, battery, menu };
+  },
+  // The preview is always the photo-mode MJPEG stream (HTTP), in VIDÉO too. The video-mode RTSP stream
+  // sends its frames over UDP, which iOS doesn't deliver without Apple's multicast entitlement, and port
+  // 8192 refuses connections in video mode. So the camera stays in photo mode while idle and only
+  // switches to video mode to record: no preview while recording.
+  live: { url: LIVE_PHOTO_URL, vlcOptions: [], photo: true },
+  prepareLive: async (cancelled) => {
+    if ((await cam.getMode()) === MODE.video) {
+      // Maybe recording, started from the camera's button: give the notification socket time to say so
+      // (the caller then cancels) instead of switching mode under a running recording.
+      await sleep(RECORDING_GRACE_MS);
+      if (cancelled()) return false;
+    }
+    if ((await cam.getMode()) !== MODE.photo) {
+      await cam.setMode(MODE.photo);
+      await sleep(MODE_SETTLE_MS);
+    }
+    return !cancelled();
+  },
+  startRecording: async () => {
+    await cam.setMode(MODE.video);
+    await sleep(MODE_SETTLE_MS);
+    await cam.record(true);
+  },
+  stopRecording: () => cam.record(false),
+  snapshot: cam.snapshot,
+  files: async () => {
+    await cam.setMode(MODE.playback);
+    return cam.files();
+  },
+  deleteFile: (f) => cam.deleteFile(f.path),
+  values: cam.settings,
+  apply: (c, opts) => cmd(c, opts),
+  wifi: cam.wifi,
+  sections: (model, menu) => settingsFor(model[0]?.includes('675') ?? false, menu),
+  firmware: (model) => model[3] ?? model[0] ?? '—',
+};
+
 // Settings screen, same order/values as SettingsActivity. The "675" firmware exposes more options.
 export type Option = { value: number; label: string };
 export type Setting =
   | { cmd: number; label: string; options: Option[] }
-  | { cmd: number; label: string; action: 'confirm' | 'ssid' | 'password' };
-export type Section = { title: string; items: Setting[] };
+  | { cmd: number; label: string; action: 'confirm' | 'ssid' | 'password'; max?: number }; // max: password length (V3+: 8)
+export type Section = { title: string; items: Setting[]; footer?: string };
 
 const list = (labels: string[]): Option[] => labels.map((label, value) => ({ value, label }));
 const OFF_ON = ['Désactivé', 'Activé'];
@@ -196,7 +275,7 @@ function staticSettings(is675: boolean): Section[] {
 
 // Same validation as the original app (checkInput01 / checkInput02).
 export const validSsid = (s: string) => /^[A-Za-z0-9_-]{1,25}$/.test(s);
-export const validPassword = (s: string) => /^[A-Za-z0-9]{8}$/.test(s);
+export const validPassword = (s: string, max = 8) => new RegExp(`^[A-Za-z0-9]{8,${max}}$`).test(s);
 
 /** Camera TIME looks like "2024/01/01 12:00:00" (local time). */
 export const parseCamTime = (t: string) => new Date(t.replace(/\//g, '-').replace(' ', 'T'));

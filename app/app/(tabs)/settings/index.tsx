@@ -3,22 +3,31 @@ import { Alert, Modal, Platform, Pressable, StyleSheet, Text as RNText, TextInpu
 import { Stack, useFocusEffect, useRouter } from 'expo-router';
 import { setStatusBarStyle } from 'expo-status-bar';
 import SettingsForm from '../../../components/SettingsForm';
-import { batteryLabel, cmd, cam, dedupe, Section, Setting, settingsFor, validPassword, validSsid } from '../../../camera';
+import { dedupe, Section, Setting, validPassword, validSsid } from '../../../camera';
 import { NotConnected, Unavailable, useCamera, useColors } from '../../../shared';
 
 const errMsg = (e: unknown) => (e instanceof Error ? e.message : String(e));
+const hint = (it: { action: string; max?: number }) =>
+  it.action === 'ssid' ? '1 à 25 lettres, chiffres, « _ » ou « - ».' : it.max ? `8 à ${it.max} lettres ou chiffres.` : '8 lettres ou chiffres exactement.';
+// Confirmation texts of the destructive actions: title, message, button.
+const CONFIRM: Record<number, [string, string, string]> = {
+  3010: ['Formater la carte SD ?', 'Toutes les vidéos et photos de la carte seront effacées. Sur une V4, comptez plus de 2 minutes.', 'Formater'],
+  3011: ['Réinitialiser les paramètres ?', 'Tous les réglages de la caméra reviendront à leur valeur d’origine.', 'Réinitialiser'],
+  3020: ['Éteindre la caméra ?', 'Pour la rallumer, maintenez son bouton marche/arrêt 1 seconde.', 'Éteindre'],
+};
 
 // Shown in every state, so help is reachable while the camera is off.
 function HelpButton() {
   const router = useRouter();
   const open = () => router.push('/settings/help');
+  const c = useColors();
   if (Platform.OS === 'ios')
     return (
       <Stack.Toolbar placement="right">
         <Stack.Toolbar.Button icon="questionmark.circle" onPress={open} accessibilityLabel="Aide" />
       </Stack.Toolbar>
     );
-  return <Stack.Screen options={{ headerRight: () => <Pressable onPress={open} hitSlop={12}><RNText style={{ fontSize: 16 }}>Aide</RNText></Pressable> }} />;
+  return <Stack.Screen options={{ headerRight: () => <Pressable onPress={open} hitSlop={12}><RNText style={{ color: c.tint, fontSize: 16 }}>Aide</RNText></Pressable> }} />;
 }
 
 // Hide pickers the firmware doesn't report in cmd 3014 (once it has answered).
@@ -34,7 +43,7 @@ const visible = (sections: Section[], values: Record<string, number>) =>
 type TextSetting = Extract<Setting, { action: string }>;
 
 export default function SettingsScreen() {
-  const { online, recording, model, battery, menu } = useCamera();
+  const { online, driver, recording, model, battery, menu } = useCamera();
   const c = useColors();
   const [values, setValues] = useState<Record<string, number>>({});
   const [wifi, setWifi] = useState<{ ssid?: string; password?: string }>({});
@@ -42,22 +51,24 @@ export default function SettingsScreen() {
   const [text, setText] = useState('');
 
   const refresh = useCallback(() => {
-    cam.wifi().then(setWifi, () => {});
-    return cam.settings().then(setValues, () => {});
-  }, []);
+    // Sequential: the camera's HTTP server copes badly with parallel requests.
+    return driver.values().then(setValues, () => {}).then(() => driver.wifi().then(setWifi, () => {}));
+  }, [driver]);
   useFocusEffect(useCallback(() => {
     setStatusBarStyle('auto');
     if (online) refresh();
   }, [online, refresh]));
 
-  if (!online) return <><HelpButton /><NotConnected /></>;
+  // No title without a camera.
+  const header = <Stack.Screen options={{ title: online ? 'Réglages' : '', headerLargeTitleEnabled: !!online }} />;
+  if (!online) return <>{header}<HelpButton /><NotConnected /></>;
   if (recording)
-    return <><HelpButton /><Unavailable symbol={{ ios: 'record.circle', android: 'fiber_manual_record' }} title="Enregistrement en cours" message="Arrêtez l’enregistrement dans l’onglet Caméra pour modifier les réglages." /></>;
+    return <>{header}<HelpButton /><Unavailable symbol={{ ios: 'record.circle', android: 'fiber_manual_record' }} title="Enregistrement en cours" message="Arrêtez l’enregistrement dans l’onglet Caméra pour modifier les réglages." /></>;
 
   const apply = async (it: Setting, opts: { par?: number; str?: string }) => {
     if (opts.par !== undefined) setValues((v) => ({ ...v, [it.cmd]: opts.par! })); // optimistic
     try {
-      await cmd(it.cmd, opts);
+      await driver.apply(it.cmd, opts);
     } catch (e) {
       Alert.alert(`Impossible de modifier « ${it.label} »`, errMsg(e));
     }
@@ -65,23 +76,19 @@ export default function SettingsScreen() {
   };
 
   const submitText = (it: TextSetting, value: string) => {
-    const ok = it.action === 'ssid' ? validSsid(value) : validPassword(value);
-    if (!ok) return Alert.alert('Valeur non valide', it.action === 'ssid' ? 'Utilisez 1 à 25 lettres, chiffres, « _ » ou « - ».' : 'Utilisez exactement 8 lettres ou chiffres.');
+    const ok = it.action === 'ssid' ? validSsid(value) : validPassword(value, it.max);
+    if (!ok) return Alert.alert('Valeur non valide', `Utilisez ${hint(it)}`);
     setEditing(null);
     apply(it, { str: value });
   };
 
   const onAction = (it: TextSetting) => {
     if (it.action === 'confirm') {
-      const format = it.cmd === 3010;
-      return Alert.alert(
-        format ? 'Formater la carte SD ?' : 'Réinitialiser les paramètres ?',
-        format ? 'Toutes les vidéos et photos de la carte seront effacées.' : 'Tous les réglages de la caméra reviendront à leur valeur d’origine.',
-        [{ text: 'Annuler', style: 'cancel' }, { text: format ? 'Formater' : 'Réinitialiser', style: 'destructive', onPress: () => apply(it, { par: 1 }) }],
-      );
+      const [title, message, button] = CONFIRM[it.cmd] ?? CONFIRM[3011];
+      return Alert.alert(title, message, [{ text: 'Annuler', style: 'cancel' }, { text: button, style: 'destructive', onPress: () => apply(it, { par: 1 }) }]);
     }
     if (Platform.OS === 'ios')
-      return Alert.prompt(it.label, it.action === 'ssid' ? '1 à 25 lettres, chiffres, « _ » ou « - ».' : 'Exactement 8 lettres ou chiffres.',
+      return Alert.prompt(it.label, hint(it),
         [{ text: 'Annuler', style: 'cancel' }, { text: 'Enregistrer', onPress: (v?: string) => submitText(it, v ?? '') }],
         it.action === 'password' ? 'secure-text' : 'plain-text');
     setText('');
@@ -90,12 +97,14 @@ export default function SettingsScreen() {
 
   return (
     <View style={{ flex: 1 }}>
+      {header}
       <HelpButton />
       <SettingsForm
-        sections={visible(settingsFor(model[0]?.includes('675') ?? false, menu), values)}
+        sections={visible(driver.sections(model, menu), values)}
         values={values}
-        firmware={model[3] ?? model[0] ?? '—'}
-        battery={batteryLabel(battery)}
+        camera={driver.name}
+        firmware={driver.firmware(model)}
+        battery={battery}
         actionValues={{ 3003: wifi.ssid, 3004: wifi.password && '••••••••' }}
         onSelect={(it, par) => apply(it, { par })}
         onAction={onAction}
@@ -114,7 +123,7 @@ export default function SettingsScreen() {
               autoCorrect={false}
               autoFocus
               secureTextEntry={editing?.action === 'password'}
-              maxLength={editing?.action === 'password' ? 8 : 25}
+              maxLength={editing?.action === 'password' ? (editing.max ?? 8) : 25}
             />
             <View style={s.dialogButtons}>
               <Pressable onPress={() => setEditing(null)} style={s.dialogBtn}><RNText style={{ color: c.tint, fontSize: 16 }}>Annuler</RNText></Pressable>

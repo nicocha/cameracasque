@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
@@ -15,8 +15,8 @@ import { Stack, useFocusEffect, useRouter } from "expo-router";
 import { setStatusBarStyle } from "expo-status-bar";
 import { SymbolView } from "expo-symbols";
 import * as Haptics from "expo-haptics";
-import { cam, CamFile, dateRange, formatCamTime as formatDate, MODE, parseCamTime } from "../../../camera";
-import { browsing, DENIED_MSG, photosAllowed, saveToPhotos, share } from "../../../media";
+import { CamFile, dateRange, formatCamTime as formatDate, parseCamTime } from "../../../camera";
+import { browsing, DENIED_MSG, photosAllowed, saveToPhotos, share, videoThumb } from "../../../media";
 import { NotConnected, Unavailable, useCamera, useColors } from "../../../shared";
 
 const errMsg = (e: unknown) => (e instanceof Error ? e.message : String(e));
@@ -24,7 +24,7 @@ const plural = (n: number, word: string) => `${n} ${word}${n > 1 ? "s" : ""}`;
 
 // Like Photos: oldest first, opens scrolled to the newest, title = period of the visible items.
 export default function GalleryScreen() {
-    const { online, recording } = useCamera();
+    const { online, driver, recording } = useCamera();
     const c = useColors();
     const { width, height } = useWindowDimensions();
     const columns = width > 600 ? 5 : 3;
@@ -44,16 +44,20 @@ export default function GalleryScreen() {
         router.push({ pathname: "/view", params: { index: String(browsing.files.indexOf(f)) } });
     };
 
+    // The spinner shows while it runs: on a V4 it first takes the camera out of preview mode (~7 s).
     const load = useCallback(async () => {
         setError(null);
+        setRefreshing(true);
         try {
-            await cam.setMode(MODE.playback);
-            const all = await cam.files();
+            const all = await driver.files();
             setFiles(all.sort((a, b) => a.time.localeCompare(b.time)));
         } catch (e) {
             setError(errMsg(e));
+            setFiles(null); // a stale list would look up to date: show the error instead
+        } finally {
+            setRefreshing(false);
         }
-    }, []);
+    }, [driver]);
 
     useFocusEffect(
         useCallback(() => {
@@ -63,11 +67,7 @@ export default function GalleryScreen() {
         }, [online, recording, load]),
     );
 
-    const refresh = async () => {
-        setRefreshing(true);
-        await load();
-        setRefreshing(false);
-    };
+    const refresh = load;
 
     // Stable ref required by FlatList.
     const onViewable = useRef(({ viewableItems }: { viewableItems: { item: CamFile }[] }) => {
@@ -130,7 +130,7 @@ export default function GalleryScreen() {
         let failed = 0;
         for (const [i, f] of items.entries()) {
             setStatus(`Suppression ${i + 1} sur ${items.length}…`);
-            await cam.deleteFile(f.path).catch(() => failed++);
+            await driver.deleteFile(f).catch(() => failed++);
         }
         setStatus(null);
         exitSelection();
@@ -139,31 +139,33 @@ export default function GalleryScreen() {
         else Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     };
 
-    if (!online) return <NotConnected />;
+    // No title without a camera; the early states restore it (the main view sets its own).
+    const header = <Stack.Screen options={{ title: online ? "Gallerie" : "", headerLargeTitleEnabled: !!online }} />;
+    if (!online) return <>{header}<NotConnected /></>;
     if (recording)
         return (
-            <Unavailable
+            <>{header}<Unavailable
                 symbol={{
                     ios: "record.circle",
                     android: "fiber_manual_record",
                 }}
                 title="Enregistrement en cours"
                 message="Arrêtez l’enregistrement dans l’onglet Caméra pour parcourir les fichiers."
-            />
+            /></>
         );
     if (error && !files)
         return (
-            <Unavailable
+            <>{header}<Unavailable
                 symbol={{ ios: "exclamationmark.triangle", android: "warning" }}
-                title="Impossible de lire la carte SD"
+                title="Fichiers indisponibles"
                 message={error}
-            />
+            /></>
         );
     if (!files)
         return (
-            <View style={[s.center, { backgroundColor: c.bg }]}>
+            <>{header}<View style={[s.center, { backgroundColor: c.bg }]}>
                 <ActivityIndicator />
-            </View>
+            </View></>
         );
 
     const n = selected.size;
@@ -290,7 +292,7 @@ export default function GalleryScreen() {
                             accessibilityState={selecting ? { selected: isSelected } : undefined}
                             accessibilityLabel={`${item.isVideo ? "Vidéo" : "Photo"}, ${formatDate(item.time)}`}
                         >
-                            <Thumb uri={item.thumb} background={c.fill} />
+                            <Thumb file={item} background={c.fill} />
                             {item.isVideo && (
                                 <View style={s.videoBadge}>
                                     <SymbolView
@@ -332,12 +334,17 @@ const startRow = (count: number, columns: number, width: number, height: number)
 };
 
 // The camera's HTTP server drops some of the parallel thumbnail requests: retry a failed one twice, spaced out.
-function Thumb({ uri, background }: { uri: string; background: string }) {
+// No thumbnail URL (V4 videos): a frame is extracted from the video instead.
+function Thumb({ file, background }: { file: CamFile; background: string }) {
     const [attempt, setAttempt] = useState(0);
+    const [uri, setUri] = useState(file.thumb);
+    useEffect(() => {
+        if (!file.thumb && file.isVideo) videoThumb(file.url).then(setUri, () => {});
+    }, [file]);
     return (
         <Image
             key={attempt}
-            source={{ uri }}
+            source={uri ? { uri } : undefined}
             style={[s.thumb, { backgroundColor: background }]}
             onError={() => attempt < 2 && setTimeout(() => setAttempt((a) => a + 1), 700 * (attempt + 1))}
         />

@@ -3,7 +3,7 @@ import { foregroundStyle, pickerStyle, tag } from '@expo/ui/swift-ui/modifiers';
 import type { SettingsFormProps } from './SettingsForm';
 
 // Real SwiftUI Form: system fonts, grouped-inset rows and menu pickers exactly like the Settings app.
-export default function SettingsForm({ sections, values, firmware, battery, actionValues, onSelect, onAction }: SettingsFormProps) {
+export default function SettingsForm({ sections, values, camera, firmware, battery, actionValues, onSelect, onAction }: SettingsFormProps) {
   return (
     <Host style={{ flex: 1 }}>
       <Form>
@@ -11,7 +11,7 @@ export default function SettingsForm({ sections, values, firmware, battery, acti
           <Section
             key={sec.title}
             title={sec.title}
-            footer={sec.title === 'WiFi' ? <Text>Après modification, redémarrez la caméra puis rejoignez le nouveau réseau.</Text> : undefined}
+            footer={sec.footer ? <Text>{sec.footer}</Text> : sec.title === 'WiFi' ? <Text>Après modification, redémarrez la caméra puis rejoignez le nouveau réseau.</Text> : undefined}
           >
             {sec.items.map((it) =>
               'options' in it ? (
@@ -42,8 +42,8 @@ export default function SettingsForm({ sections, values, firmware, battery, acti
           </Section>
         ))}
         <Section title="Informations">
-          <LabeledContent label="Caméra compatible">
-            <Text>Cambox V3+</Text>
+          <LabeledContent label="Caméra">
+            <Text>{camera}</Text>
           </LabeledContent>
           <LabeledContent label="Batterie">
             <Text>{battery}</Text>

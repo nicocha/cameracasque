@@ -57,8 +57,9 @@ Live : `http://192.168.1.254:8192` (MJPEG, mode photo uniquement). Le RTSP du mo
 ## Code
 
 - `camera.ts` — protocole (sans dépendance React Native)
+- `camera4.ts` — protocole Cambox V4 / V4 Plus / V4 Pro (CGI sur 192.168.2.1, vérifié sur une V4 Pro, firmware 1.2.7). Le modèle est détecté automatiquement (`shared.tsx`)
 - `media.ts` — téléchargement vers Photos et partage
-- `help.ts` — contenu de l'aide, réécrit d'après le manuel Cambox V3+ (non redistribué)
+- `help.ts` — contenu de l'aide, réécrit d'après les manuels Cambox V3+, V4 et V4 Pro (non redistribués, `docs/` est ignoré par git)
 - `shared.tsx` — état de connexion, couleurs clair/sombre, écran « contenu indisponible »
 - `app/` — écrans (expo-router) : pile racine (`_layout.tsx`) avec le visualiseur `view.tsx` en plein écran au-dessus des onglets natifs `(tabs)/` : `index.tsx` Caméra, `gallery/`, `settings/` (dont `help.tsx`)
 

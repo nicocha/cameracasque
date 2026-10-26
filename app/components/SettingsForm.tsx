@@ -6,6 +6,7 @@ import { useColors } from '../shared';
 export type SettingsFormProps = {
   sections: Section[];
   values: Record<string, number>;
+  camera: string;
   firmware: string;
   battery: string;
   /** current value shown on action rows (WiFi name, masked password), by cmd */
@@ -19,7 +20,7 @@ type Choice = Extract<Setting, { options: unknown }>;
 // Android: Material settings pattern (a list preference). Title with the current value as summary;
 // a tap opens a radio-button dialog. @expo/ui's ListItem squeezed its label to one letter per line
 // as soon as a dropdown sat in the trailing slot. iOS uses SettingsForm.ios.tsx.
-export default function SettingsForm({ sections, values, firmware, battery, actionValues, onSelect, onAction }: SettingsFormProps) {
+export default function SettingsForm({ sections, values, camera, firmware, battery, actionValues, onSelect, onAction }: SettingsFormProps) {
   const c = useColors();
   const [open, setOpen] = useState<Choice | null>(null);
 
@@ -61,14 +62,14 @@ export default function SettingsForm({ sections, values, firmware, battery, acti
                 />
               ),
             )}
-            {sec.title === 'WiFi' && (
-              <Text style={[s.footer, { color: c.secondary }]}>Après modification, redémarrez la caméra puis rejoignez le nouveau réseau.</Text>
+            {(sec.footer || sec.title === 'WiFi') && (
+              <Text style={[s.footer, { color: c.secondary }]}>{sec.footer ?? 'Après modification, redémarrez la caméra puis rejoignez le nouveau réseau.'}</Text>
             )}
           </View>
         ))}
         <View style={s.section}>
           <Text style={[s.header, { color: c.tint }]} accessibilityRole="header">Informations</Text>
-          <Row title="Caméra compatible" summary="Cambox V3+" />
+          <Row title="Caméra" summary={camera} />
           <Row title="Batterie" summary={battery} />
           <Row title="Version du firmware" summary={firmware} />
         </View>
