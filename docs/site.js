@@ -2,7 +2,8 @@
 const CONFIG = {
   repo: 'nicocha/cameracasque', // GitHub "owner/name"
   testflight: '', // public TestFlight invitation, e.g. "https://testflight.apple.com/join/XXXXXXXX"
-  apkName: 'camera-casque.apk', // asset attached to each GitHub release
+  play: 'https://play.google.com/apps/testing/com.nicocha.cameracasque', // Google Play closed test, until the app is in production
+  testers: 'https://groups.google.com/g/testeurs-cameracasque', // joining this group gives access to the test
 };
 
 const gh = `https://github.com/${CONFIG.repo}`;
@@ -10,7 +11,8 @@ const LINKS = {
   repo: gh,
   releases: `${gh}/releases`,
   issues: `${gh}/issues`,
-  apk: `${gh}/releases/latest/download/${CONFIG.apkName}`,
+  play: CONFIG.play,
+  testers: CONFIG.testers,
   testflight: CONFIG.testflight,
 };
 
