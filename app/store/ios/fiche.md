@@ -89,13 +89,20 @@ cambox,v3+,v4,pro,moto,cheval,vélo,équitation,embarquée,action,wifi,helmet,da
 
 ## Captures d'écran (fichiers de ce dossier)
 
-| Écran | Fichiers | Format |
+Chaque dossier contient `1-camera.png` à `5-help.png`, à déposer dans cet ordre.
+
+| Taille dans App Store Connect | Dossier | Format |
 |---|---|---|
-| iPhone 6,9" | `1-camera.png` … `5-help.png`, dans cet ordre | 1320 × 2868 PNG |
+| Dynamic Island (large), 6,9" | `6.9/` | 1320 × 2868 PNG |
+| Dynamic Island (medium), 6,3" : **obligatoire** | `6.3/` | 1206 × 2622 PNG |
+| iPhone Duo, écran extérieur | `duo-outer/` | 1398 × 2034 PNG (portrait) |
+| iPhone Duo, écran intérieur | `duo-inner/` | 2853 × 2007 PNG (paysage) |
 
-Apple réduit lui-même ces captures pour les tailles d'iPhone plus petites. Pas de captures iPad : l'app est réservée à l'iPhone (`supportsTablet: false`).
+Les tailles plus petites reprennent ces captures, réduites par Apple. Pas de captures iPad : l'app est réservée à l'iPhone (`supportsTablet: false`).
 
-Les captures d'origine du simulateur (iPhone 18 Pro Max, 9:41) sont encadrées et titrées comme celles de Google Play.
+Les captures de l'iPhone Duo affichent sur la fiche un badge « optimisée pour iPhone Duo ». Elles deviennent obligatoires en avril 2027 pour les apps compilées avec le SDK iOS 27.1 ou plus récent.
+
+Les captures d'origine du simulateur (iPhone 18 Pro Max et iPhone Duo, 9:41) sont encadrées et titrées comme celles de Google Play, sans transparence.
 
 ## Confidentialité de l'app
 
