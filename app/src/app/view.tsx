@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Image, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { ActivityIndicator, Alert, AppState, FlatList, Image, Platform, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { SymbolView } from 'expo-symbols';
@@ -21,10 +21,58 @@ const mo = (bytes: number) => `${(bytes / 1e6).toLocaleString('fr-FR', { maximum
 
 // Native player (AVPlayer / ExoPlayer), with its own controls. Not VLC: its OpenGL ES view stopped the whole app
 // drawing when iPhone Duo moved the window to its other display. VLC stays for the live preview (RTSP, MJPEG).
+// iPhone Duo opened or closed: the window moves to the other display. The app is backgrounded for a moment, so
+// expo-video pauses the player, and the old AVPlayerViewController didn't come back on the new display (no picture,
+// controls dead). Closing the phone can also fail the stream (crossed-out play icon). So each display gets a fresh
+// view of the same player; a pause from the switch resumes, a failed stream reloads where it was.
+const SWITCH_MS = 3000; // a pause or failure this close to a display switch comes from the switch
 function Video({ url, onDuration }: { url: string; onDuration: (ms: number) => void }) {
-  const player = useVideoPlayer(url, (p) => p.play());
+  const player = useVideoPlayer(url, (p) => {
+    p.timeUpdateEventInterval = 1;
+    p.play();
+  });
+  const { width, height } = useWindowDimensions();
+  const at = useRef({ switched: 0, paused: 0, failed: 0, playing: true, time: 0 });
+  const near = (t: number) => Date.now() - t < SWITCH_MS;
+  const reload = () => {
+    const a = at.current;
+    a.failed = 0;
+    player.replaceAsync(url).then(() => { player.currentTime = a.time; if (a.playing) player.play(); }, () => {});
+  };
+  const recover = () => {
+    const a = at.current;
+    if (player.status === 'error' || near(a.failed)) reload();
+    else if (a.playing && !player.playing && near(a.paused)) player.play();
+  };
   useEventListener(player, 'sourceLoad', (e) => e.duration > 0 && onDuration(e.duration * 1000));
-  return <VideoView player={player} style={{ flex: 1 }} contentFit="contain" nativeControls allowsPictureInPicture={false} />;
+  useEventListener(player, 'timeUpdate', ({ currentTime }) => { if (currentTime > 0) at.current.time = currentTime; });
+  useEventListener(player, 'playingChange', ({ isPlaying }) => {
+    const a = at.current;
+    if (isPlaying) return void (a.playing = true);
+    a.paused = Date.now();
+    if (a.playing && near(a.switched)) player.play();
+    else a.playing = false;
+  });
+  useEventListener(player, 'statusChange', ({ status }) => {
+    if (status !== 'error') return;
+    at.current.failed = Date.now();
+    if (near(at.current.switched)) reload();
+  });
+  // Back in the foreground (the display switch backgrounds the app): a stream that failed meanwhile reloads.
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => state === 'active' && player.status === 'error' && reload());
+    return () => sub.remove();
+  }, [player]); // eslint-disable-line react-hooks/exhaustive-deps -- reload only reads refs and the player
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) return void (first.current = false);
+    at.current.switched = Date.now();
+    recover();
+    // Still stopped once the switch settled, without an error status: reload anyway.
+    const t = setTimeout(() => at.current.playing && !player.playing && reload(), 1500);
+    return () => clearTimeout(t);
+  }, [width, height, player]); // eslint-disable-line react-hooks/exhaustive-deps -- on a display switch only
+  return <VideoView key={`${width}x${height}`} player={player} style={{ flex: 1 }} contentFit="contain" nativeControls allowsPictureInPicture={false} />;
 }
 
 // Swipe left/right through the Galerie's list, like Photos. Only the visible page plays a video
