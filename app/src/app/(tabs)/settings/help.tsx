@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Linking, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { Host, Picker, Text as SwiftText } from '@expo/ui/swift-ui';
 import { pickerStyle, tag } from '@expo/ui/swift-ui/modifiers';
 import { Stack } from 'expo-router';
@@ -7,7 +7,7 @@ import Constants from 'expo-constants';
 import { SymbolView, SymbolViewProps } from 'expo-symbols';
 import { HELP_V3, HELP_V4 } from '../../../help';
 import { v4 } from '../../../camera4';
-import { useCamera, useColors } from '../../../shared';
+import { sideBarWidth, useCamera, useColors } from '../../../shared';
 
 const SITE = 'https://www.cameracasque.fr';
 
@@ -22,10 +22,12 @@ export default function HelpScreen() {
   const { driver } = useCamera();
   const [model, setModel] = useState(driver === v4 ? 1 : 0);
   const { topics, source } = MODELS[model];
+  const window = useWindowDimensions();
+  const side = sideBarWidth(window.width, window.height);
   return (
     <>
       <Stack.Screen options={{ title: 'Aide' }} />
-      <ScrollView contentInsetAdjustmentBehavior="automatic" style={{ backgroundColor: c.bg }} contentContainerStyle={s.content}>
+      <ScrollView contentInsetAdjustmentBehavior="automatic" style={{ backgroundColor: c.bg }} contentContainerStyle={[s.content, { paddingRight: 16 + side }]}>
         {/* iOS: the system segmented control. Android: the same choice drawn as Material-style segments. */}
         {Platform.OS === 'ios' ? (
           <Host matchContents={{ vertical: true }}>
@@ -51,7 +53,7 @@ export default function HelpScreen() {
         {topics.map((t) => (
           <View key={t.title} style={s.topic}>
             <View style={s.heading} accessibilityRole="header">
-              <SymbolView name={t.symbol as SymbolViewProps['name']} size={22} tintColor={c.tint} />
+              <SymbolView name={t.symbol as SymbolViewProps['name']} size={22 * window.fontScale} tintColor={c.tint} />
               <Text style={[s.title, { color: c.label }]}>{t.title}</Text>
             </View>
             {t.body.map((p) =>

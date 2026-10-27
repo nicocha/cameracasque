@@ -93,6 +93,14 @@ export const useColors = () => {
   return system || palette[scheme === 'dark' ? 'dark' : 'light'];
 };
 
+// iPhone Duo puts the tab bar and toolbar on the right side: on the outer display, and on the inner one in landscape
+// (in portrait it keeps horizontal bars). They float over the content without changing the safe area, so screens
+// reserve their width themselves. Only Duo's displays are this wide for their height (a regular iPhone is about
+// 0.46, and this app is portrait-only there); 600 pt separates the outer display from the inner one.
+const SIDE_BAR = 80;
+export const sideBarWidth = (w: number, h: number) =>
+  Platform.OS === 'ios' && Math.min(w, h) / Math.max(w, h) > 0.6 && (w < 600 || w > h) ? SIDE_BAR : 0;
+
 /** A camera error in plain words: a request that times out or can't reach the camera means it isn't answering. */
 export const errMsg = (e: unknown) => {
   const m = e instanceof Error ? e.message : String(e);

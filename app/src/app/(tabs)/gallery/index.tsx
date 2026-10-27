@@ -18,7 +18,7 @@ import { SymbolView } from "expo-symbols";
 import * as Haptics from "expo-haptics";
 import { CamFile, dateRange, formatCamTime as formatDate, parseCamTime } from "../../../camera";
 import { browsing, DENIED_MSG, photosAllowed, saveToPhotos, share, videoThumb } from "../../../media";
-import { errMsg, NotConnected, Unavailable, useCamera, useColors } from "../../../shared";
+import { errMsg, NotConnected, sideBarWidth, Unavailable, useCamera, useColors } from "../../../shared";
 
 const plural = (n: number, word: string) => `${n} ${word}${n > 1 ? "s" : ""}`;
 
@@ -26,7 +26,9 @@ const plural = (n: number, word: string) => `${n} ${word}${n > 1 ? "s" : ""}`;
 export default function GalleryScreen() {
     const { online, driver, recording } = useCamera();
     const c = useColors();
-    const { width, height } = useWindowDimensions();
+    const window = useWindowDimensions();
+    const side = sideBarWidth(window.width, window.height);
+    const { width, height } = { width: window.width - side, height: window.height }; // of the grid, clear of the side bar
     const columns = width > 600 ? 5 : 3;
     const [files, setFiles] = useState<CamFile[] | null>(null);
     const [error, setError] = useState<string | null>(null);
@@ -264,7 +266,7 @@ export default function GalleryScreen() {
                 // Start near the end only when the grid overflows the screen: a FlatList started at a row
                 // it can't scroll to leaves the rows above it blank (seen on Android with 2 rows).
                 initialScrollIndex={startRow(files.length, columns, width, height)}
-                contentContainerStyle={files.length === 0 && { flex: 1 }}
+                contentContainerStyle={[{ paddingRight: side }, files.length === 0 && { flex: 1 }]}
                 ListEmptyComponent={
                     <Unavailable
                         symbol={{

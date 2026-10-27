@@ -8,16 +8,11 @@ import { useEventListener } from 'expo';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { CamFile, formatCamTime } from '../camera';
 import { browsing, cachedThumb, DENIED_MSG, photosAllowed, saveToPhotos, share } from '../media';
-import { errMsg, useCamera } from '../shared';
+import { errMsg, sideBarWidth, useCamera } from '../shared';
 
 // Always dark, like Photos' full-screen viewer and the Camera app: video letterboxing is black, so a light
 // background around it left white bands above and below.
 const V = { bg: '#000', label: '#fff', secondary: 'rgba(235, 235, 245, 0.6)' };
-// iPhone Duo puts the toolbar on the right side. It floats over the content without changing the safe area,
-// so the video's own controls and the info bar ran under it. Only Duo's displays are this wide for their
-// height (a regular iPhone is about 0.46, and this app is portrait-only there).
-const SIDE_BAR = 80;
-const sideBarWidth = (w: number, h: number) => (Platform.OS === 'ios' && Math.min(w, h) / Math.max(w, h) > 0.6 ? SIDE_BAR : 0);
 const mmss = (ms: number) => {
   const t = Math.round(ms / 1000);
   return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`;
@@ -196,12 +191,12 @@ export default function ViewerScreen() {
             <View style={s.meta}>
               {f.isVideo && (
                 <View style={s.metaItem} accessibilityLabel={`Durée ${durations[f.path] ? mmss(durations[f.path]) : 'inconnue'}`}>
-                  <SymbolView name={{ ios: 'clock', android: 'schedule' }} size={13} tintColor={V.secondary} />
+                  <SymbolView name={{ ios: 'clock', android: 'schedule' }} size={13 * window.fontScale} tintColor={V.secondary} />
                   <Text style={[s.metaText, s.tabular, { color: V.secondary }]}>{durations[f.path] ? mmss(durations[f.path]) : '–:––'}</Text>
                 </View>
               )}
               <View style={s.metaItem}>
-                <SymbolView name={{ ios: 'internaldrive', android: 'sd_card' }} size={13} tintColor={V.secondary} />
+                <SymbolView name={{ ios: 'internaldrive', android: 'sd_card' }} size={13 * window.fontScale} tintColor={V.secondary} />
                 <Text style={[s.metaText, { color: V.secondary }]}>{mo(f.size)}</Text>
               </View>
               <Text style={[s.metaText, s.tabular, s.position, { color: V.secondary }]}>{`${index + 1} sur ${files.length}`}</Text>
@@ -230,7 +225,7 @@ const s = StyleSheet.create({
   // Leaves room above the iOS bottom toolbar, which floats over the content (on the side on iPhone Duo).
   info: { gap: 4, paddingTop: 12, paddingBottom: Platform.OS === 'ios' ? 96 : 12, paddingHorizontal: 20 },
   name: { fontSize: 15, fontWeight: '600' }, // Subheadline, emphasized
-  meta: { flexDirection: 'row', alignItems: 'center', gap: 14, minHeight: 18 },
+  meta: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 14, minHeight: 18 }, // wraps at large text sizes
   metaItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   metaText: { fontSize: 13 }, // Footnote
   tabular: { fontVariant: ['tabular-nums'] },
