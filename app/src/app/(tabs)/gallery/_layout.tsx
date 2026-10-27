@@ -4,7 +4,7 @@ export default function Layout() {
     return (
         <Stack
             screenOptions={{
-                title: "Gallerie",
+                title: "Galerie",
                 headerLargeTitleEnabled: true,
                 headerShadowVisible: false,
             }}

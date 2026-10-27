@@ -6,7 +6,7 @@ import type { CamFile } from './camera';
 
 // Cameras without a thumbnail endpoint (V4): grab a frame from the video itself, one at a time
 // since each one reads part of the file over the camera's WiFi. Kept for the session once extracted.
-// A failure is forgotten so the next Gallerie visit retries (the camera refuses files while busy), and an
+// A failure is forgotten so the next Galerie visit retries (the camera refuses files while busy), and an
 // extraction that never answers stops holding up the others after THUMB_TIMEOUT_MS.
 const THUMB_TIMEOUT_MS = 20_000;
 const thumbs = new Map<string, Promise<string>>();
@@ -28,7 +28,7 @@ export function videoThumb(url: string) {
 /** The thumbnail URL if there is one, or the extracted frame once ready. */
 export const cachedThumb = (f: CamFile) => f.thumb || done.get(f.url) || '';
 
-/** The Gallerie's current list, handed to the viewer so it can swipe through it (too big for route params). */
+/** The Galerie's current list, handed to the viewer so it can swipe through it (too big for route params). */
 export const browsing: { files: CamFile[] } = { files: [] };
 
 export const DENIED_MSG = 'Accès à Photos refusé. Autorisez-le dans Réglages > Caméra Casque.';

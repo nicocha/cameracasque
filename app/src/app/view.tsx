@@ -8,12 +8,11 @@ import { useEventListener } from 'expo';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { CamFile, formatCamTime } from '../camera';
 import { browsing, cachedThumb, DENIED_MSG, photosAllowed, saveToPhotos, share } from '../media';
-import { useCamera } from '../shared';
+import { errMsg, useCamera } from '../shared';
 
 // Always dark, like Photos' full-screen viewer and the Camera app: video letterboxing is black, so a light
 // background around it left white bands above and below.
 const V = { bg: '#000', label: '#fff', secondary: 'rgba(235, 235, 245, 0.6)' };
-const errMsg = (e: unknown) => (e instanceof Error ? e.message : String(e));
 // iPhone Duo puts the toolbar on the right side. It floats over the content without changing the safe area,
 // so the video's own controls and the info bar ran under it. Only Duo's displays are this wide for their
 // height (a regular iPhone is about 0.46, and this app is portrait-only there).
@@ -33,7 +32,7 @@ function Video({ url, onDuration }: { url: string; onDuration: (ms: number) => v
   return <VideoView player={player} style={{ flex: 1 }} contentFit="contain" nativeControls allowsPictureInPicture={false} />;
 }
 
-// Swipe left/right through the Gallerie's list, like Photos. Only the visible page plays a video
+// Swipe left/right through the Galerie's list, like Photos. Only the visible page plays a video
 // (the camera serves one stream well); neighbours show their thumbnail.
 export default function ViewerScreen() {
   const params = useLocalSearchParams<{ index: string }>();

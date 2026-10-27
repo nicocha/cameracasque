@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
     Alert,
+    ColorValue,
     FlatList,
     Image,
     Platform,
@@ -17,9 +18,8 @@ import { SymbolView } from "expo-symbols";
 import * as Haptics from "expo-haptics";
 import { CamFile, dateRange, formatCamTime as formatDate, parseCamTime } from "../../../camera";
 import { browsing, DENIED_MSG, photosAllowed, saveToPhotos, share, videoThumb } from "../../../media";
-import { NotConnected, Unavailable, useCamera, useColors } from "../../../shared";
+import { errMsg, NotConnected, Unavailable, useCamera, useColors } from "../../../shared";
 
-const errMsg = (e: unknown) => (e instanceof Error ? e.message : String(e));
 const plural = (n: number, word: string) => `${n} ${word}${n > 1 ? "s" : ""}`;
 
 // Like Photos: oldest first, opens scrolled to the newest, title = period of the visible items.
@@ -140,7 +140,7 @@ export default function GalleryScreen() {
     };
 
     // No title without a camera (no bar at all on Android, level with the Camera tab); the early states restore it (the main view sets its own).
-    const header = <Stack.Screen options={{ title: online ? "Gallerie" : "", headerLargeTitleEnabled: !!online, headerShown: !!online || Platform.OS === "ios" }} />;
+    const header = <Stack.Screen options={{ title: online ? "Galerie" : "", headerLargeTitleEnabled: !!online, headerShown: !!online || Platform.OS === "ios" }} />;
     if (!online) return <>{header}<NotConnected /></>;
     if (recording)
         return (
@@ -159,6 +159,7 @@ export default function GalleryScreen() {
                 symbol={{ ios: "exclamationmark.triangle", android: "warning" }}
                 title="Fichiers indisponibles"
                 message={error}
+                action={{ label: "Réessayer", onPress: load }}
             /></>
         );
     if (!files)
@@ -175,7 +176,7 @@ export default function GalleryScreen() {
             ? n
                 ? `${n} sélectionné${n > 1 ? "s" : ""}` // short: the toolbar leaves little room
                 : "Sélectionner"
-            : (range ?? "Gallerie"));
+            : (range ?? "Galerie"));
 
     return (
         <>
@@ -335,7 +336,7 @@ const startRow = (count: number, columns: number, width: number, height: number)
 
 // The camera's HTTP server drops some of the parallel thumbnail requests: retry a failed one twice, spaced out.
 // No thumbnail URL (V4 videos): a frame is extracted from the video instead.
-function Thumb({ file, background }: { file: CamFile; background: string }) {
+function Thumb({ file, background }: { file: CamFile; background: ColorValue }) {
     const [attempt, setAttempt] = useState(0);
     const [uri, setUri] = useState(file.thumb);
     useEffect(() => {
@@ -351,7 +352,7 @@ function Thumb({ file, background }: { file: CamFile; background: string }) {
     );
 }
 
-function HeaderIcon({ name, label, onPress, disabled, color }: { name: string; label: string; onPress: () => void; disabled?: boolean; color: string }) {
+function HeaderIcon({ name, label, onPress, disabled, color }: { name: string; label: string; onPress: () => void; disabled?: boolean; color: ColorValue }) {
     return (
         <Pressable onPress={onPress} disabled={disabled} hitSlop={8} style={[s.headerIcon, disabled && { opacity: 0.38 }]} accessibilityRole="button" accessibilityLabel={label}>
             <SymbolView name={{ ios: "circle", android: name as never }} size={24} tintColor={color} />

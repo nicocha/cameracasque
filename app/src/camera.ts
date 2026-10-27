@@ -24,7 +24,7 @@ const ERRORS: Record<number, string> = {
 export class CamError extends Error {
   status: number;
   constructor(cmd: number, status: number) {
-    super(ERRORS[status] ?? `Commande ${cmd} refusée (code ${status})`);
+    super(ERRORS[status] ?? `La caméra a refusé cette commande (n° ${cmd}, code ${status}).`);
     this.status = status;
   }
 }

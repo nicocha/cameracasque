@@ -1,24 +1,23 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Platform, Pressable, StyleSheet, Switch, Text, View, useWindowDimensions } from 'react-native';
+import { ActivityIndicator, Alert, Platform, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ArrangementView, Host, RNHostView, VStack } from '@expo/ui/swift-ui';
 import { arrangementViewStyle, splitArrangementFixedLayoutSize, splitArrangementLayoutRatio } from '@expo/ui/swift-ui/modifiers';
 import { useFocusEffect } from 'expo-router';
 import { setStatusBarStyle } from 'expo-status-bar';
 import * as Haptics from 'expo-haptics';
+import { SymbolView } from 'expo-symbols';
 import { VLCPlayer } from 'react-native-vlc-media-player';
 import { MODE } from '../../camera';
-import { NotConnected, useCamera } from '../../shared';
+import { errMsg, NotConnected, useCamera } from '../../shared';
 
 // The camera leaves preview mode to record (see each driver's `live`): no preview while recording.
 const YELLOW = '#ffd60a'; // Camera app's selected-mode color
-const errMsg = (e: unknown) => (e instanceof Error ? e.message : String(e));
 // ArrangementView needs iOS 27.1; below it, it renders its children without a container.
 const ARRANGEMENT = Platform.OS === 'ios' && parseFloat(String(Platform.Version)) >= 27.1;
-const TOGGLE_HEIGHT = 52; // previewToggle: minHeight + paddingTop
-// Largest frame of ratio `r` that leaves `reserve` points below it in `box`; full width until the box is measured.
-const fitted = (box: { width: number; height: number } | null, r: number, reserve: number) =>
-  box ? { width: Math.min(box.width, (box.height - reserve) * r), aspectRatio: r } : { width: '100%' as const, aspectRatio: r };
+// Largest frame of ratio `r` that fits in `box`; full width until the box is measured.
+const fitted = (box: { width: number; height: number } | null, r: number) =>
+  box ? { width: Math.min(box.width, box.height * r), aspectRatio: r } : { width: '100%' as const, aspectRatio: r };
 
 export default function LiveScreen() {
   const { online, driver, recording, setRecording } = useCamera();
@@ -43,7 +42,7 @@ export default function LiveScreen() {
   const startPreview = () => { setPlaying(false); setFailed(false); setReady(true); };
 
   // On focus and whenever a recording ends (from the app or the camera's button): back to photo mode + preview.
-  // Also covers coming back from Gallerie, which leaves the camera in playback mode.
+  // Also covers coming back from Galerie, which leaves the camera in playback mode.
   useFocusEffect(
     useCallback(() => {
       if (!online || recording || !preview) return;
@@ -65,13 +64,13 @@ export default function LiveScreen() {
     return () => clearInterval(id);
   }, [recording]);
 
-  const run = async (fn: () => Promise<unknown>) => {
+  const run = async (title: string, fn: () => Promise<unknown>) => {
     setBusy(true);
     try {
       await fn();
     } catch (e) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      Alert.alert('La caméra a refusé la commande', errMsg(e));
+      Alert.alert(title, errMsg(e));
     } finally {
       setBusy(false);
     }
@@ -104,8 +103,9 @@ export default function LiveScreen() {
   const shutter = () => {
     if (locked) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    if (isVideo) run(recording ? async () => { await driver.stopRecording(); setRecording(false); } : startRecording);
-    else run(() => driver.snapshot());
+    if (isVideo && recording) run('Arrêt de l’enregistrement impossible', async () => { await driver.stopRecording(); setRecording(false); });
+    else if (isVideo) run('Enregistrement impossible', startRecording);
+    else run('Photo impossible', () => driver.snapshot());
   };
 
   if (!online) return <NotConnected dark />;
@@ -121,7 +121,7 @@ export default function LiveScreen() {
   // PHOTO shows the whole frame; VIDÉO crops it to the 16:9 recording frame. VLC ignores resizeMode on iOS,
   // so the player is sized to the stream's own ratio and never stretched. Fitted to the space measured in `box`.
   const viewfinder = (
-    <View style={[s.viewfinder, fitted(box, isVideo ? 16 / 9 : aspect, ARRANGEMENT || sideBySide ? 0 : TOGGLE_HEIGHT)]}>
+    <View style={[s.viewfinder, fitted(box, isVideo ? 16 / 9 : aspect)]}>
       {ready && preview && !failed && (
         <VLCPlayer
           key={attempt}
@@ -161,12 +161,22 @@ export default function LiveScreen() {
           <Text style={s.failedTitle}>Connexion au flux…</Text>
         </View>
       )}
-    </View>
-  );
-  const toggle = (
-    <View style={s.previewToggle}>
-      <Text style={s.previewLabel}>Aperçu</Text>
-      <Switch value={preview} onValueChange={togglePreview} disabled={locked || recording} trackColor={{ true: YELLOW }} accessibilityLabel="Aperçu" />
+      {/* A toggle button in the frame's corner, like the Camera app's: filled in yellow while on. */}
+      <Pressable
+        onPress={() => togglePreview(!preview)}
+        disabled={locked || recording}
+        hitSlop={8}
+        style={[s.previewBtn, preview && s.previewOn, (locked || recording) && { opacity: 0.4 }]}
+        accessibilityRole="switch"
+        accessibilityLabel="Aperçu"
+        accessibilityState={{ checked: preview, disabled: locked || recording }}
+      >
+        <SymbolView
+          name={{ ios: preview ? 'eye.fill' : 'eye.slash', android: preview ? 'visibility' : 'visibility_off' }}
+          size={20}
+          tintColor={preview ? '#000' : '#fff'}
+        />
+      </Pressable>
     </View>
   );
   const controls = (
@@ -214,10 +224,7 @@ export default function LiveScreen() {
           {viewfinder}
           <View style={s.recOverlay}>{recPill}</View>
         </View>
-        <View style={s.side}>
-          {toggle}
-          {controls}
-        </View>
+        <View style={s.side}>{controls}</View>
       </SafeAreaView>
     );
 
@@ -240,10 +247,7 @@ export default function LiveScreen() {
             <ArrangementView.Secondary>
               <VStack modifiers={[halves ? splitArrangementLayoutRatio(0.5) : splitArrangementFixedLayoutSize()]}>
                 <RNHostView key={String(halves)} matchContents={!halves && { vertical: true }}>
-                  <View style={halves && s.half}>
-                    {toggle}
-                    {controls}
-                  </View>
+                  <View style={halves && s.half}>{controls}</View>
                 </RNHostView>
               </VStack>
             </ArrangementView.Secondary>
@@ -257,8 +261,6 @@ export default function LiveScreen() {
       <View style={s.topBar}>{recPill}</View>
       <View style={s.viewfinderArea} onLayout={(e) => setBox(e.nativeEvent.layout)}>
         {viewfinder}
-        {/* Centered under the viewfinder it controls: clear of corners (camera, side bars) whatever the display. */}
-        {toggle}
       </View>
       {controls}
     </SafeAreaView>
@@ -272,9 +274,9 @@ const s = StyleSheet.create({
   upper: { flex: 1, alignItems: 'center', justifyContent: 'flex-end' },
   row: { flexDirection: 'row' },
   half: { flex: 1, justifyContent: 'center' },
-  side: { width: 240, justifyContent: 'center' }, // fits « VIDÉO PHOTO » and the toggle
-  previewToggle: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, paddingTop: 8, minHeight: TOGGLE_HEIGHT },
-  previewLabel: { color: '#fff', fontSize: 15 },
+  side: { width: 240, justifyContent: 'center' }, // fits « VIDÉO PHOTO »
+  previewBtn: { position: 'absolute', top: 8, right: 8, width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', backgroundColor: '#0000008c' },
+  previewOn: { backgroundColor: YELLOW },
   recPill: { backgroundColor: '#ff3b30', borderRadius: 6, paddingHorizontal: 8, paddingVertical: 2 },
   recText: { color: '#fff', fontSize: 17, fontVariant: ['tabular-nums'], fontWeight: '600' },
   viewfinderArea: { flex: 1, alignItems: 'center', justifyContent: 'center' },

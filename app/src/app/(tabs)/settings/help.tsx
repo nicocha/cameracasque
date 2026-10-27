@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Linking, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Host, Picker, Text as SwiftText } from '@expo/ui/swift-ui';
+import { pickerStyle, tag } from '@expo/ui/swift-ui/modifiers';
 import { Stack } from 'expo-router';
 import Constants from 'expo-constants';
 import { SymbolView, SymbolViewProps } from 'expo-symbols';
@@ -24,6 +26,14 @@ export default function HelpScreen() {
     <>
       <Stack.Screen options={{ title: 'Aide' }} />
       <ScrollView contentInsetAdjustmentBehavior="automatic" style={{ backgroundColor: c.bg }} contentContainerStyle={s.content}>
+        {/* iOS: the system segmented control. Android: the same choice drawn as Material-style segments. */}
+        {Platform.OS === 'ios' ? (
+          <Host matchContents={{ vertical: true }}>
+            <Picker selection={model} onSelectionChange={(i: number) => setModel(i)} modifiers={[pickerStyle('segmented')]}>
+              {MODELS.map((m, i) => <SwiftText key={m.key} modifiers={[tag(i)]}>{m.label}</SwiftText>)}
+            </Picker>
+          </Host>
+        ) : (
         <View style={[s.segments, { backgroundColor: c.fill }]} accessibilityRole="tablist">
           {MODELS.map((m, i) => (
             <Pressable
@@ -37,6 +47,7 @@ export default function HelpScreen() {
             </Pressable>
           ))}
         </View>
+        )}
         {topics.map((t) => (
           <View key={t.title} style={s.topic}>
             <View style={s.heading} accessibilityRole="header">
@@ -76,10 +87,10 @@ export default function HelpScreen() {
 // iOS text styles: Title 3 semibold for headings, Body, Footnote.
 const s = StyleSheet.create({
   content: { padding: 16, paddingBottom: 32, gap: 28 },
-  // Segmented control look: a filled track with the selected segment raised.
-  segments: { flexDirection: 'row', borderRadius: 9, padding: 2 },
-  segment: { flex: 1, minHeight: 32, borderRadius: 7, alignItems: 'center', justifyContent: 'center' },
-  segmentText: { fontSize: 13 },
+  // Android segments: a filled track with the selected segment raised.
+  segments: { flexDirection: 'row', borderRadius: 12, padding: 2 },
+  segment: { flex: 1, minHeight: 44, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  segmentText: { fontSize: 15 },
   topic: { gap: 8 },
   heading: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 2 },
   title: { fontSize: 20, fontWeight: '600', flexShrink: 1 },

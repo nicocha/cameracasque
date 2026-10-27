@@ -4,7 +4,7 @@ Pilote la caméra Cambox V3+ via son WiFi, avec le protocole HTTP Novatek
 extrait de l'APK d'origine (`com.ajn.camboxv3plus` 1.0.1).
 
 - **Live** : flux vidéo (RTSP) / photo (MJPEG), enregistrement, prise de photo
-- **Gallerie** : grille façon Photos (période visible en titre), lecture, sélection multiple : enregistrer dans Photos, partager (un élément), supprimer
+- **Galerie** : grille façon Photos (période visible en titre), lecture, sélection multiple : enregistrer dans Photos, partager (un élément), supprimer
 - **Réglages** : résolution, durée de fichier, exposition, balance des blancs, rafale,
   extinction auto, fréquence, formatage SD, reset, nom et mot de passe du WiFi
 - **Aide** : manuel intégré (bouton ? dans Réglages, lien depuis « Caméra non connectée »)

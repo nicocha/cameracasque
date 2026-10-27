@@ -65,7 +65,7 @@ const query = (o: Record<string, string>) => Object.entries(o).map(([k, v]) => `
 
 async function cgi(name: string, params?: Record<string, string>, timeoutMs?: number) {
   const text = await fetchText(`/cgi-bin/${name}${params ? `?${query(params)}` : ''}`, timeoutMs);
-  if (text.startsWith('NOK')) throw new Error(`Commande refusée par la caméra (${name.replace('_cgi', '')})`);
+  if (text.startsWith('NOK')) throw new Error(`La caméra a refusé cette commande (${name.replace('_cgi', '')}).`);
   return parseKv(text);
 }
 

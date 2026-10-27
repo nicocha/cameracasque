@@ -1,5 +1,5 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
+import { Platform, PlatformColor, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
 import { router } from 'expo-router';
 import { SymbolView, SymbolViewProps } from 'expo-symbols';
 import TcpSocket from 'react-native-tcp-socket';
@@ -78,12 +78,28 @@ export function CameraProvider({ children }: { children: ReactNode }) {
   return <Ctx.Provider value={{ online, driver, model, recording, battery, menu, setRecording }}>{children}</Ctx.Provider>;
 }
 
-// iOS semantic colors (systemBackground, label, secondaryLabel, separator), light and dark.
-const palette = {
+// Values of the iOS semantic colors, light and dark: Android's palette, and screens that are always dark.
+export const palette = {
   light: { bg: '#ffffff', label: '#000000', secondary: '#3c3c4399', fill: '#7676801f', tint: '#007aff', red: '#ff3b30' },
   dark: { bg: '#000000', label: '#ffffff', secondary: '#ebebf599', fill: '#7676803d', tint: '#0a84ff', red: '#ff453a' },
 };
-export const useColors = () => palette[useColorScheme() === 'dark' ? 'dark' : 'light'];
+// iOS: the system colors themselves, which also follow Increase Contrast.
+const system = Platform.OS === 'ios' && {
+  bg: PlatformColor('systemBackground'), label: PlatformColor('label'), secondary: PlatformColor('secondaryLabel'),
+  fill: PlatformColor('tertiarySystemFill'), tint: PlatformColor('link'), red: PlatformColor('systemRed'),
+};
+export const useColors = () => {
+  const scheme = useColorScheme();
+  return system || palette[scheme === 'dark' ? 'dark' : 'light'];
+};
+
+/** A camera error in plain words: a request that times out or can't reach the camera means it isn't answering. */
+export const errMsg = (e: unknown) => {
+  const m = e instanceof Error ? e.message : String(e);
+  return /abort|network request failed|timed? ?out/i.test(m)
+    ? 'La caméra ne répond pas. Vérifiez qu’elle est allumée et que le téléphone est connecté à son WiFi.'
+    : m;
+};
 
 /** Equivalent of UIContentUnavailableConfiguration: symbol, title, explanation. */
 export function Unavailable({ symbol, title, message, dark, action }: {
@@ -92,10 +108,13 @@ export function Unavailable({ symbol, title, message, dark, action }: {
   const system = useColors();
   const c = dark ? palette.dark : system;
   return (
-    <View style={[s.center, { backgroundColor: c.bg }]} accessible accessibilityLabel={`${title}. ${message}`}>
-      <SymbolView name={symbol} size={48} tintColor={c.secondary} />
-      <Text style={[s.title, { color: c.label }]}>{title}</Text>
-      <Text style={[s.message, { color: c.secondary }]}>{message}</Text>
+    <View style={[s.center, { backgroundColor: c.bg }]}>
+      {/* Read as one element; the action stays a separate button for VoiceOver. */}
+      <View style={s.group} accessible accessibilityLabel={`${title}. ${message}`}>
+        <SymbolView name={symbol} size={48} tintColor={c.secondary} />
+        <Text style={[s.title, { color: c.label }]}>{title}</Text>
+        <Text style={[s.message, { color: c.secondary }]}>{message}</Text>
+      </View>
       {action && (
         <Pressable onPress={action.onPress} hitSlop={8} style={s.action} accessibilityRole="button">
           <Text style={[s.message, { color: c.tint }]}>{action.label}</Text>
@@ -111,7 +130,7 @@ export function NotConnected({ dark }: { dark?: boolean }) {
       dark={dark}
       symbol={{ ios: 'wifi.slash', android: 'wifi_off' }}
       title="Caméra non connectée"
-      message={'Rejoignez le réseau WiFi de la caméra dans les Réglages du téléphone.\n\nSur Android, si la connexion échoue, désactivez les données mobiles.'}
+      message={`Rejoignez le réseau WiFi de la caméra dans les Réglages du téléphone.${Platform.OS === 'android' ? '\n\nSi la connexion échoue, désactivez les données mobiles.' : ''}`}
       action={{ label: 'Comment connecter la caméra', onPress: () => router.push('/settings/help') }}
     />
   );
@@ -119,6 +138,7 @@ export function NotConnected({ dark }: { dark?: boolean }) {
 
 const s = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 8 },
+  group: { alignItems: 'center', gap: 8 },
   title: { fontSize: 22, fontWeight: '700', marginTop: 12, textAlign: 'center' },
   message: { fontSize: 17, textAlign: 'center' },
   action: { minHeight: 44, justifyContent: 'center', marginTop: 8 },

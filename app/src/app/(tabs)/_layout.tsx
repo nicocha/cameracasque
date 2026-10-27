@@ -19,7 +19,7 @@ export default function TabsLayout() {
                     md="photo_library"
                 />
                 <NativeTabs.Trigger.Label>
-                    Gallerie
+                    Galerie
                 </NativeTabs.Trigger.Label>
             </NativeTabs.Trigger>
             <NativeTabs.Trigger name="settings">

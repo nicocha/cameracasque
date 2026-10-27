@@ -4,9 +4,8 @@ import { Stack, useFocusEffect, useRouter } from 'expo-router';
 import { setStatusBarStyle } from 'expo-status-bar';
 import SettingsForm from '../../../components/SettingsForm';
 import { dedupe, Section, Setting, validPassword, validSsid } from '../../../camera';
-import { NotConnected, Unavailable, useCamera, useColors } from '../../../shared';
+import { errMsg, NotConnected, Unavailable, useCamera, useColors } from '../../../shared';
 
-const errMsg = (e: unknown) => (e instanceof Error ? e.message : String(e));
 const hint = (it: { action: string; max?: number }) =>
   it.action === 'ssid' ? '1 à 25 lettres, chiffres, « _ » ou « - ».' : it.max ? `8 à ${it.max} lettres ou chiffres.` : '8 lettres ou chiffres exactement.';
 // Confirmation texts of the destructive actions: title, message, button.

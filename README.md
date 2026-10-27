@@ -17,7 +17,7 @@
 
 <p align="center">
   <img src="docs/img/camera-dark.webp" width="200" alt="Écran Caméra : aperçu en direct">
-  <img src="docs/img/gallery-light.webp" width="200" alt="Écran Gallerie">
+  <img src="docs/img/gallery-light.webp" width="200" alt="Écran Galerie">
   <img src="docs/img/settings-light.webp" width="200" alt="Écran Réglages">
 </p>
 

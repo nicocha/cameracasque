@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ColorValue, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { Section, Setting } from '../camera';
 import { useColors } from '../shared';
 
@@ -24,7 +24,7 @@ export default function SettingsForm({ sections, values, camera, firmware, batte
   const c = useColors();
   const [open, setOpen] = useState<Choice | null>(null);
 
-  const Row = ({ title, summary, color, onPress }: { title: string; summary?: string; color?: string; onPress?: () => void }) => (
+  const Row = ({ title, summary, color, onPress }: { title: string; summary?: string; color?: ColorValue; onPress?: () => void }) => (
     <Pressable
       onPress={onPress}
       disabled={!onPress}

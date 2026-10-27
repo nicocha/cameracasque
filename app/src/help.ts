@@ -70,7 +70,7 @@ export const HELP_V3: HelpTopic[] = [
         title: "Récupérer vos vidéos",
         symbol: { ios: "photo.on.rectangle", android: "photo_library" },
         body: [
-            "Par WiFi : onglet Gallerie, cliquez sur une vidéo puis Enregistrer pour la copier dans Photos.",
+            "Par WiFi : onglet Galerie, touchez une vidéo puis Enregistrer pour la copier dans Photos.",
             "Par USB : caméra éteinte, branchez-la à l’ordinateur. Elle apparaît comme un disque.",
             "Par la carte : appuyez sur la carte microSD pour l’éjecter, puis lisez-la avec un lecteur microSD ou l’adaptateur SD fourni.",
         ],
@@ -96,7 +96,7 @@ export const HELP_V3: HelpTopic[] = [
             "Impossible d’activer le WiFi : batterie faible, ou appui trop long sur le bouton WiFi (l’appui long change la résolution).",
             "Impossible de se connecter : rejoignez le WiFi de la caméra avant d’ouvrir l’app, actualisez la liste des réseaux et vérifiez que le voyant orange reste fixe.",
             "La caméra s’éteint au hasard : température hors de −5 °C à 55 °C, bouton appuyé par erreur, ou un autre téléphone connecté. Vérifiez aussi Réglages > Extinction auto.",
-            "Le voyant reste fixe à l’enregistrement : carte pleine. Supprimez des fichiers dans Gallerie ou formatez la carte.",
+            "Le voyant reste fixe à l’enregistrement : carte pleine. Supprimez des fichiers dans Galerie ou formatez la carte.",
         ],
     },
     {
@@ -168,8 +168,8 @@ export const HELP_V4: HelpTopic[] = [
         symbol: { ios: "eye", android: "visibility" },
         body: [
             "L’onglet Caméra affiche l’image en direct pour régler l’angle et vérifier vos réglages. Le voyant caméra clignote alors en bleu.",
-            "La caméra ne peut pas enregistrer pendant l’aperçu. L’app le coupe d’elle-même pour enregistrer ou ouvrir la Gallerie : comptez environ 6 secondes. L’aperçu reprend en une dizaine de secondes.",
-            "Désactivez l’interrupteur Aperçu pour enregistrer sans attente et économiser la batterie.",
+            "La caméra ne peut pas enregistrer pendant l’aperçu. L’app le coupe d’elle-même pour enregistrer ou ouvrir la Galerie : comptez environ 6 secondes. L’aperçu reprend en une dizaine de secondes.",
+            "L’aperçu est désactivé au lancement. Touchez l’œil en haut à droite de l’image pour l’activer, et coupez-le pour enregistrer sans attente et économiser la batterie.",
             "Un réglage modifié met 3 à 5 secondes à apparaître dans l’aperçu.",
         ],
     },
@@ -207,7 +207,7 @@ export const HELP_V4: HelpTopic[] = [
         title: "Récupérer vos vidéos",
         symbol: { ios: "photo.on.rectangle", android: "photo_library" },
         body: [
-            "Par WiFi : onglet Gallerie, cliquez sur une vidéo pour la lire, puis Enregistrer pour la copier sur le téléphone.",
+            "Par WiFi : onglet Galerie, touchez une vidéo pour la lire, puis Enregistrer pour la copier sur le téléphone.",
             "Par USB : mettez la caméra en pause (voyant rouge fixe), puis branchez-la à l’ordinateur. Elle apparaît comme un disque.",
             "Par la carte : éjectez la microSD et lisez-la avec un lecteur ou l’adaptateur SD fourni.",
         ],
