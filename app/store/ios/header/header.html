@@ -1,0 +1,18 @@
+<!doctype html>
+<!-- App Store product page header. Render with ./render.sh (16:9 5244x2950 and 21:9 3840x1646).
+     Everything is sized in vh and centered, so both crops keep the focal point in the safe center. -->
+<html><head><meta charset="utf-8"><style>
+  html, body { margin: 0; width: 100vw; height: 100vh; overflow: hidden; background: #000; }
+  .glow { position: absolute; inset: 0;
+    background: radial-gradient(ellipse 55vh 55vh at 50% 58%, rgba(255,227,0,.22), rgba(255,227,0,0) 100%); }
+  .ring { position: absolute; left: 50%; top: 56%; width: 92vh; height: 92vh; transform: translate(-50%, -50%);
+    border-radius: 50%; box-sizing: border-box; border: 15vh solid #FFE300;
+    box-shadow: 0 0 12vh rgba(255,227,0,.35); }
+  .phone { position: absolute; left: 50%; top: 9vh; height: 108vh; transform: translateX(-50%) rotate(-8deg);
+    transform-origin: 50% 40%; border-radius: 14% / 6.65%;
+    box-shadow: 0 4vh 10vh rgba(0,0,0,.8); }
+</style></head><body>
+  <div class="glow"></div>
+  <div class="ring"></div>
+  <img class="phone" src="1-camera.png" alt="">
+</body></html>

@@ -2,7 +2,7 @@
 const CONFIG = {
   repo: 'nicocha/cameracasque', // GitHub "owner/name"
   testflight: '', // public TestFlight invitation, e.g. "https://testflight.apple.com/join/XXXXXXXX"
-  play: 'https://play.google.com/apps/testing/com.nicocha.cameracasque', // Google Play closed test, until the app is in production
+  play: 'https://play.google.com/apps/testing/fr.cameracasque.app', // Google Play closed test, until the app is in production
   testers: 'https://groups.google.com/g/testeurs-cameracasque', // joining this group gives access to the test
 };
 

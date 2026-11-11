@@ -83,7 +83,7 @@ vers un faux serveur.
 
 ## Publication
 
-- Builds avec EAS (`eas.json`, projet `@nicocha/cambox`, numéros de build gérés par EAS) :
+- Builds avec EAS (`eas.json`, projet `@nicocha/cameracasque`, numéros de build gérés par EAS) :
   `npx eas-cli build -p android --profile production` (AAB) et `-p ios`. Ne pas laisser
   `EXPO_PUBLIC_CAM_HOST` / `EXPO_PUBLIC_CAM4_HOST` dans l'environnement d'un build de production.
 - Google Play : test fermé « Alpha », testeurs = membres du groupe `testeurs-cameracasque@googlegroups.com`.

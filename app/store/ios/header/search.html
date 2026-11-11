@@ -1,0 +1,18 @@
+<!doctype html>
+<!-- App Store search results image. Render with ./render.sh (16:9 5244x2950, 3:2 3840x2560 and 1920x1280).
+     Sized in vh and centered so every ratio keeps the three screens whole. -->
+<html><head><meta charset="utf-8"><style>
+  html, body { margin: 0; width: 100vw; height: 100vh; overflow: hidden; background: #000; }
+  .ring { position: absolute; left: 50%; top: 50%; width: 96vh; height: 96vh; transform: translate(-50%, -50%);
+    border-radius: 50%; box-sizing: border-box; border: 15vh solid #FFE300;
+    box-shadow: 0 0 12vh rgba(255,227,0,.35); }
+  img { position: absolute; top: 50%; border-radius: 14% / 6.65%; box-shadow: 0 3vh 8vh rgba(0,0,0,.85); }
+  .center { left: 50%; height: 92vh; transform: translate(-50%, -50%); z-index: 2; }
+  .left   { left: calc(50% - 47vh); height: 76vh; transform: translate(-50%, -50%) rotate(-6deg); z-index: 1; }
+  .right  { left: calc(50% + 47vh); height: 76vh; transform: translate(-50%, -50%) rotate(6deg); z-index: 1; }
+</style></head><body>
+  <div class="ring"></div>
+  <img class="left" src="1-camera.png" alt="">
+  <img class="right" src="3-viewer.png" alt="">
+  <img class="center" src="2-gallery.png" alt="">
+</body></html>

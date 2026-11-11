@@ -49,7 +49,7 @@ sports équestres, sports mécaniques, karting, vélo, ski.
 
 - **Android** : test fermé Google Play, ouvert à tous. Rejoindre le groupe
   [Testeurs Caméra Casque](https://groups.google.com/g/testeurs-cameracasque), puis
-  [l’invitation Google Play](https://play.google.com/apps/testing/com.nicocha.cameracasque).
+  [l’invitation Google Play](https://play.google.com/apps/testing/fr.cameracasque.app).
 - **iPhone** : TestFlight puis App Store, en préparation (compte développeur en cours d’activation).
 
 Détails sur [cameracasque.fr](https://cameracasque.fr/#installer).

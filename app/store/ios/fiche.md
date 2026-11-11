@@ -1,7 +1,7 @@
 # Fiche App Store : Caméra Casque
 
 Textes à copier dans App Store Connect (Apps › Caméra Casque).
-Langue principale : français, `fr-FR`. Identifiant de bundle : `com.nicocha.cameracasque`. SKU : `cameracasque`.
+Langue principale : français, `fr-FR`. Identifiant de bundle : `fr.cameracasque.app`. SKU : `cameracasque`.
 
 ## Informations sur l'app
 
@@ -102,6 +102,12 @@ Les tailles plus petites reprennent ces captures, réduites par Apple. Pas de ca
 
 Les captures de l'iPhone Duo affichent sur la fiche un badge « optimisée pour iPhone Duo ». Elles deviennent obligatoires en avril 2027 pour les apps compilées avec le SDK iOS 27.1 ou plus récent.
 
+**En-tête de la fiche** (Ressources créatives › En-tête de la page produit) : `header-5244x2950.png` (16:9) et `header-3840x1646.png` (21:9), PNG sans transparence. Sans texte, donc rien à traduire ; le sujet reste au centre pour survivre aux recadrages. Source : `header/header.html`.
+
+**Image des résultats de recherche** : `search-5244x2950.png` (16:9), `search-3840x2560.png` et `search-1920x1280.png` (3:2). Trois écrans (Caméra, Galerie, Lecture) pour montrer l'usage d'un coup d'œil. Source : `header/search.html`.
+
+Pour modifier ces images : éditer le HTML, puis lancer `header/render.sh`, qui régénère toutes les tailles.
+
 Les captures d'origine du simulateur (iPhone 18 Pro Max et iPhone Duo, 9:41) sont encadrées et titrées comme celles de Google Play, sans transparence.
 
 ## Confidentialité de l'app
@@ -125,7 +131,7 @@ Caméra Casque est l'application compagnon d'un accessoire : elle pilote une cam
 
 Sans caméra, l'app affiche « Caméra non connectée ». L'aide intégrée (onglet Réglages › Aide) reste consultable. Aucun identifiant n'est nécessaire.
 
-Vidéo de démonstration avec une caméra : <lien>
+Vidéo de démonstration avec une caméra : <lien> (script : `video-revue.md`)
 
 Caméra Casque is the companion app for an accessory: it controls a Cambox helmet camera (V3+ or V4) over the local WiFi network the camera creates. The manufacturer has closed and its app is no longer available. Without a camera the app shows "Caméra non connectée"; the built-in help (Réglages › Aide) remains available. No login is required. Demo video with a camera: <link>
 ```
