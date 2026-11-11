@@ -136,6 +136,8 @@ export type Driver = {
   wifi: () => Promise<{ ssid?: string; password?: string }>;
   sections: (model: string[], menu: Record<string, Option[]>) => Section[];
   firmware: (model: string[]) => string;
+  /** Shown in Informations: the exact model when the camera reports one. */
+  label: (model: string[]) => string;
 };
 
 // The camera needs a moment after a mode change before its stream server answers (the original app waits 1 s).
@@ -190,6 +192,7 @@ export const v3: Driver = {
   wifi: cam.wifi,
   sections: (model, menu) => settingsFor(model[0]?.includes('675') ?? false, menu),
   firmware: (model) => model[3] ?? model[0] ?? '—',
+  label: () => 'Cambox V3+',
 };
 
 // Settings screen, same order/values as SettingsActivity. The "675" firmware exposes more options.

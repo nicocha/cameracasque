@@ -119,7 +119,7 @@ export default function SettingsScreen() {
       <SettingsForm
         sections={visible(driver.sections(model, menu), values)}
         values={values}
-        camera={driver.name}
+        camera={driver.label(model)}
         firmware={driver.firmware(model)}
         battery={battery}
         actionValues={{ 3003: wifi.ssid, 3004: wifi.password && '••••••••' }}

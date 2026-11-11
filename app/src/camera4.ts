@@ -85,6 +85,7 @@ async function write(g: Group, changes: Record<string, string>) {
 // Like the original app, every dot is dropped: "1.2.7" → 127.
 export const oldFirmware = (version: string) => Number(version.replaceAll('.', '')) < 120;
 let version = '';
+let model = ''; // last one read: a reconnection while the camera is busy (e.g. just after a resolution change) may get no answer
 
 /** battery_req_cgi gives millivolts; the camera warns at 3200 and stops at 3090. */
 export function batteryV4(mv: number) {
@@ -157,9 +158,9 @@ export const v4: Driver = {
       hour: pad(d.getHours()), minute: pad(d.getMinutes()), second: pad(d.getSeconds()),
     }).catch(() => {});
     const info = await cgi('model_req_cgi').catch(() => ({} as Record<string, string>));
-    version = info.version ?? '';
+    if (info.model) [model, version] = [info.model, info.version ?? ''];
     const battery = await cgi('battery_req_cgi').then((b) => batteryV4(Number(Object.values(b)[0])), () => '—');
-    return { model: [info.model ?? 'cbv4', version], battery, menu: {} };
+    return { model: [model || 'cbv4', version], battery, menu: {} };
   },
   isRecording: async () => (await cgi('record_req_cgi', { action: 'get' })).onoff === 'on', // a failed read keeps the last state
   // The camera's own RTSP server; TCP so iOS needs no multicast entitlement (see the V3+ note in camera.ts).
@@ -251,6 +252,7 @@ export const v4: Driver = {
   },
   sections: ([model]) => sectionsV4(model ?? '', groups.video_cfg_cgi),
   firmware: ([, v]) => v || '—',
+  label: ([m]) => ({ cbv4plus: 'Cambox V4+', cbv4pro: 'Cambox V4 Pro' } as Record<string, string>)[m] ?? 'Cambox V4',
 };
 
 export function sectionsV4(model: string, video?: Record<string, string>): Section[] {
