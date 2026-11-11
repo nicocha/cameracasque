@@ -122,6 +122,7 @@ export const EN: Record<string, string> = {
 
   // Viewer
   'Téléchargement…': 'Downloading…',
+  'Chargement…': 'Loading…',
   'Télécharger': 'Download',
   'Enregistré dans Photos': 'Saved to Photos',
   'Échec du téléchargement : {error}': 'Download failed: {error}',

@@ -49,10 +49,13 @@ export default function GalleryScreen() {
         router.push({ pathname: "/view", params: { index: String(browsing.files.indexOf(f)) } });
     };
 
-    // The spinner shows while it runs: on a V4 it first takes the camera out of preview mode (~7 s).
-    const load = useCallback(async () => {
+    // Takes a while: on a V4 it first takes the camera out of preview mode (~7 s). The pull-to-refresh spinner
+    // shows only when pulled: shown on focus, it pushed the grid down, which slid back up once loaded.
+    const LOADING = t("Chargement…");
+    const load = useCallback(async (pulled = false) => {
         setError(null);
-        setRefreshing(true);
+        if (pulled) setRefreshing(true);
+        else setStatus((st) => st ?? LOADING);
         try {
             const all = await driver.files();
             setFiles(all.sort((a, b) => a.time.localeCompare(b.time)));
@@ -61,8 +64,9 @@ export default function GalleryScreen() {
             setFiles(null); // a stale list would look up to date: show the error instead
         } finally {
             setRefreshing(false);
+            setStatus((st) => (st === LOADING ? null : st));
         }
-    }, [driver]);
+    }, [driver, LOADING]);
 
     useFocusEffect(
         useCallback(() => {
@@ -72,7 +76,7 @@ export default function GalleryScreen() {
         }, [online, recording, load]),
     );
 
-    const refresh = load;
+    const refresh = () => load(true);
 
     // Stable ref required by FlatList.
     const onViewable = useRef(({ viewableItems }: { viewableItems: { item: CamFile }[] }) => {
@@ -164,12 +168,14 @@ export default function GalleryScreen() {
                 symbol={{ ios: "exclamationmark.triangle", android: "warning" }}
                 title={t("Fichiers indisponibles")}
                 message={error}
-                action={{ label: t("Réessayer"), onPress: load }}
+                action={{ label: t("Réessayer"), onPress: () => load() }}
             /></>
         );
+    // Small title already: the grid's top inset follows the bar, so a large title collapsing as the files
+    // arrive slid the first row up under it.
     if (!files)
         return (
-            <>{header}<View style={[s.center, { backgroundColor: c.bg }]}>
+            <><Stack.Screen options={{ title: "", headerLargeTitleEnabled: false }} /><View style={[s.center, { backgroundColor: c.bg }]}>
                 <ActivityIndicator />
             </View></>
         );
