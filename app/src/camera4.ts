@@ -8,10 +8,12 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const HOST = process.env.EXPO_PUBLIC_CAM4_HOST ?? '192.168.2.1';
 const BASE = `http://${HOST}`;
 const DIR = '100CAMBX';
-// func_mode=1 (re)starts this stream (720p30 H.264). Measured on a V4 Pro: port 8554 opens ~6.2 s after the set,
-// and the camera stops any recording.
+// func_mode=1 (re)starts this stream (720p30 H.264) and stops any recording. Measured on a V4 Pro: port 8554 opens
+// ~2 s after the set, then each DESCRIBE takes ~3 s. Sent from 3.5 s on, the image shows ~3.5 s later; sent right
+// as the port opens, DESCRIBE may never be answered, and quick mode switches can wedge the stream until a reboot.
 const LIVE_URL = `rtsp://${HOST.split(':')[0]}:8554/video`;
-const PREVIEW_SETTLE_MS = 6500;
+const PREVIEW_SETTLE_MS = 4000;
+let previewSince = 0; // when this app last set func_mode=1; 0 if it didn't (stream up long ago)
 const RECORD_SETTLE_MS = 6000;
 const PLAYER_RELEASE_MS = 1500;
 
@@ -141,6 +143,7 @@ async function leavePreview() {
   if ((await read('general_cfg_cgi')).func_mode === '0') return;
   await sleep(PLAYER_RELEASE_MS);
   await write('general_cfg_cgi', { func_mode: '0' });
+  previewSince = 0;
   await sleep(RECORD_SETTLE_MS);
 }
 
@@ -164,8 +167,10 @@ export const v4: Driver = {
   prepareLive: async (cancelled) => {
     if ((await read('general_cfg_cgi')).func_mode !== '1') {
       await write('general_cfg_cgi', { func_mode: '1' });
-      await sleep(PREVIEW_SETTLE_MS);
+      previewSince = Date.now();
     }
+    // Also when a second prepare finds the mode already set by one still waiting: the stream isn't up yet.
+    await sleep(Math.max(0, previewSince + PREVIEW_SETTLE_MS - Date.now()));
     return !cancelled();
   },
   stopLive: leavePreview,

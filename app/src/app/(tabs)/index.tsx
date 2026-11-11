@@ -14,6 +14,7 @@ import { errMsg, NotConnected, useCamera, useLang } from '../../shared';
 
 // The camera leaves preview mode to record (see each driver's `live`): no preview while recording.
 const YELLOW = '#ffd60a'; // Camera app's selected-mode color
+const NO_IMAGE_MS = 20000;
 // ArrangementView needs iOS 27.1; below it, it renders its children without a container.
 const ARRANGEMENT = Platform.OS === 'ios' && parseFloat(String(Platform.Version)) >= 27.1;
 // Largest frame of ratio `r` that fits in `box`; full width until the box is measured.
@@ -58,6 +59,14 @@ export default function LiveScreen() {
   );
 
   const retry = () => { setPlaying(false); setFailed(false); setAttempt((a) => a + 1); };
+
+  // A wedged camera stream never answers and VLC never reports an error: give up and offer Réessayer.
+  // V4 Pro measured ~12 s to the first image on iPhone.
+  useEffect(() => {
+    if (!ready || !preview || failed || playing) return;
+    const id = setTimeout(() => setFailed(true), NO_IMAGE_MS);
+    return () => clearTimeout(id);
+  }, [ready, preview, failed, playing, attempt]);
 
   useEffect(() => {
     if (!recording) return setElapsed(0);
