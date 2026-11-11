@@ -175,7 +175,7 @@ export default function GalleryScreen() {
     // arrive slid the first row up under it.
     if (!files)
         return (
-            <><Stack.Screen options={{ title: "", headerLargeTitleEnabled: false }} /><View style={[s.center, { backgroundColor: c.bg }]}>
+            <><Stack.Screen options={{ title: "", headerLargeTitleEnabled: false, headerShown: true }} /><View style={[s.center, { backgroundColor: c.bg }]}>
                 <ActivityIndicator />
             </View></>
         );

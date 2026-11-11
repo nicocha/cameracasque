@@ -77,7 +77,8 @@
                         "en"
                     ]
                 }
-            ]
+            ],
+            "expo-font"
         ],
         "scheme": "cambox",
         "extra": {
