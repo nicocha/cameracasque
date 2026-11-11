@@ -133,7 +133,7 @@ Sans caméra, l'app affiche « Caméra non connectée ». L'aide intégrée (ong
 
 Vidéo de démonstration avec une caméra : <lien> (script : `video-revue.md`)
 
-Caméra Casque is the companion app for an accessory: it controls a Cambox helmet camera (V3+ or V4) over the local WiFi network the camera creates. The manufacturer has closed and its app is no longer available. Without a camera the app shows "Caméra non connectée"; the built-in help (Réglages › Aide) remains available. No login is required. Demo video with a camera: <link>
+Caméra Casque is the companion app for an accessory: it controls a Cambox helmet camera (V3+ or V4) over the local WiFi network the camera creates. The manufacturer has closed and its app is no longer available. The app follows the device language (French or English). Without a camera it shows "Camera Not Connected" ("Caméra non connectée" in French); the built-in help (Settings › Help) remains available. No login is required. Demo video with a camera: <link>
 ```
 
 - **Pièce jointe** : l'autorisation de Cambox Vision pour la mention de la marque, si elle est obtenue.

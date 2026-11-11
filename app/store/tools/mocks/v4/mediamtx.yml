@@ -1,0 +1,9 @@
+rtspAddress: :8554
+rtmp: no
+hls: no
+webrtc: no
+srt: no
+paths:
+  video:
+    runOnInit: ffmpeg -re -f lavfi -i testsrc2=size=1280x720:rate=30 -c:v libx264 -preset ultrafast -tune zerolatency -pix_fmt yuv420p -f rtsp rtsp://localhost:8554/video
+    runOnInitRestart: yes

@@ -87,7 +87,7 @@ Vidéo YouTube : facultative. Celle de la démonstration pour la revue peut serv
 ```
 L'application pilote une caméra casque Cambox (V3+ ou V4) par son réseau WiFi local. Sans caméra, elle affiche « Caméra non connectée » et l'aide intégrée (onglet Réglages › Aide) reste consultable. Aucun identifiant n'est nécessaire. Vidéo de démonstration avec une caméra : <lien>
 
-The app controls a Cambox helmet camera (V3+ or V4) over the camera's local WiFi network. Without a camera it shows "Caméra non connectée"; the built-in help (Réglages › Aide) remains available. No login is required. Demo video with a camera: <link>
+The app controls a Cambox helmet camera (V3+ or V4) over the camera's local WiFi network. The app follows the device language (French or English). Without a camera it shows "Camera Not Connected" ("Caméra non connectée" in French); the built-in help (Settings › Help) remains available. No login is required. Demo video with a camera: <link>
 ```
 
 - **Classification du contenu** (questionnaire IARC) : catégorie « Toutes les autres applications » ; répondre Non à toutes les questions (pas de violence, de contenu sexuel, de jeux d'argent, d'interactions entre utilisateurs, de partage de position, d'achats). Résultat attendu : PEGI 3 / Tout public.
