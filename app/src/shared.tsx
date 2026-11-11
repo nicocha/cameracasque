@@ -1,10 +1,37 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useState, useSyncExternalStore } from 'react';
 import { Platform, PlatformColor, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
 import { router } from 'expo-router';
+import { File, Paths } from 'expo-file-system';
+import { getLocales } from 'expo-localization';
 import { SymbolView, SymbolViewProps } from 'expo-symbols';
 import TcpSocket from 'react-native-tcp-socket';
 import { batteryLabel, Driver, EVENT, Option, NOTIFY, parseStatus, STATUS, v3 } from './camera';
 import { v4 } from './camera4';
+import { getLang, Lang, setLang, subscribe, t } from './i18n';
+
+// Language: the phone's (French if it's set to French, English otherwise) unless chosen in Settings.
+export type LangChoice = 'auto' | Lang;
+const langFile = new File(Paths.document, 'language.txt');
+const deviceLang = (): Lang => (getLocales()[0]?.languageCode === 'fr' ? 'fr' : 'en');
+export function languageChoice(): LangChoice {
+  try {
+    const v = langFile.exists ? langFile.textSync().trim() : '';
+    return v === 'fr' || v === 'en' ? v : 'auto';
+  } catch {
+    return 'auto';
+  }
+}
+export function chooseLanguage(c: LangChoice) {
+  try {
+    if (!langFile.exists) langFile.create();
+    langFile.writeSync(c);
+  } catch {} // not saved: still applies until the app restarts
+  setLang(c === 'auto' ? deviceLang() : c);
+}
+const saved = languageChoice();
+setLang(saved === 'auto' ? deviceLang() : saved);
+/** Re-renders the calling screen when the language changes. */
+export const useLang = () => useSyncExternalStore(subscribe, getLang);
 
 const HEARTBEAT_MS = 10000;
 
@@ -105,8 +132,8 @@ export const sideBarWidth = (w: number, h: number) =>
 export const errMsg = (e: unknown) => {
   const m = e instanceof Error ? e.message : String(e);
   return /abort|network request failed|timed? ?out/i.test(m)
-    ? 'La caméra ne répond pas. Vérifiez qu’elle est allumée et que le téléphone est connecté à son WiFi.'
-    : m;
+    ? t('La caméra ne répond pas. Vérifiez qu’elle est allumée et que le téléphone est connecté à son WiFi.')
+    : t(m); // the drivers' messages are in French
 };
 
 /** Equivalent of UIContentUnavailableConfiguration: symbol, title, explanation. */
@@ -137,9 +164,9 @@ export function NotConnected({ dark }: { dark?: boolean }) {
     <Unavailable
       dark={dark}
       symbol={{ ios: 'wifi.slash', android: 'wifi_off' }}
-      title="Caméra non connectée"
-      message={`Rejoignez le réseau WiFi de la caméra dans les Réglages du téléphone.${Platform.OS === 'android' ? '\n\nSi la connexion échoue, désactivez les données mobiles.' : ''}`}
-      action={{ label: 'Comment connecter la caméra', onPress: () => router.push('/settings/help') }}
+      title={t('Caméra non connectée')}
+      message={t('Rejoignez le réseau WiFi de la caméra dans les Réglages du téléphone.') + (Platform.OS === 'android' ? `\n\n${t('Si la connexion échoue, désactivez les données mobiles.')}` : '')}
+      action={{ label: t('Comment connecter la caméra'), onPress: () => router.push('/settings/help') }}
     />
   );
 }

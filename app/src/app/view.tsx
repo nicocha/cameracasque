@@ -8,7 +8,8 @@ import { useEventListener } from 'expo';
 import { useVideoPlayer, VideoView } from 'expo-video';
 import { CamFile, formatCamTime } from '../camera';
 import { browsing, cachedThumb, DENIED_MSG, photosAllowed, saveToPhotos, share } from '../media';
-import { errMsg, sideBarWidth, useCamera } from '../shared';
+import { locale, t } from '../i18n';
+import { errMsg, sideBarWidth, useCamera, useLang } from '../shared';
 
 // Always dark, like Photos' full-screen viewer and the Camera app: video letterboxing is black, so a light
 // background around it left white bands above and below.
@@ -17,7 +18,7 @@ const mmss = (ms: number) => {
   const t = Math.round(ms / 1000);
   return `${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}`;
 };
-const mo = (bytes: number) => `${(bytes / 1e6).toLocaleString('fr-FR', { maximumFractionDigits: 1 })} Mo`;
+const mo = (bytes: number) => t('{n} Mo', { n: (bytes / 1e6).toLocaleString(locale(), { maximumFractionDigits: 1 }) });
 
 // Native player (AVPlayer / ExoPlayer), with its own controls. Not VLC: its OpenGL ES view stopped the whole app
 // drawing when iPhone Duo moved the window to its other display. VLC stays for the live preview (RTSP, MJPEG).
@@ -78,6 +79,7 @@ function Video({ url, onDuration }: { url: string; onDuration: (ms: number) => v
 // Swipe left/right through the Galerie's list, like Photos. Only the visible page plays a video
 // (the camera serves one stream well); neighbours show their thumbnail.
 export default function ViewerScreen() {
+  useLang();
   const params = useLocalSearchParams<{ index: string }>();
   const router = useRouter();
   const { driver } = useCamera();
@@ -98,7 +100,6 @@ export default function ViewerScreen() {
   }, [width]); // eslint-disable-line react-hooks/exhaustive-deps -- only on resize; swiping already moves the offset
   const f = files[index];
   if (!f) return null;
-  const what = f.isVideo ? 'la vidéo' : 'la photo';
 
   const keepDuration = (path: string) => (e: { duration?: number }) => {
     if (e.duration && e.duration > 0 && durations[path] !== e.duration) setDurations((d) => ({ ...d, [path]: e.duration! }));
@@ -111,15 +112,15 @@ export default function ViewerScreen() {
   };
 
   const save = async () => {
-    if (!(await photosAllowed())) return setStatus(DENIED_MSG);
+    if (!(await photosAllowed())) return setStatus(t(DENIED_MSG));
     setSaving(true);
-    setStatus('Téléchargement…');
+    setStatus(t('Téléchargement…'));
     try {
       await saveToPhotos(f.name, f.url);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      setStatus('Enregistré dans Photos');
+      setStatus(t('Enregistré dans Photos'));
     } catch (e) {
-      setStatus(`Échec du téléchargement : ${errMsg(e)}`);
+      setStatus(t('Échec du téléchargement : {error}', { error: errMsg(e) }));
     } finally {
       setSaving(false);
     }
@@ -127,12 +128,12 @@ export default function ViewerScreen() {
 
   const shareFile = async () => {
     setSaving(true);
-    setStatus('Téléchargement…');
+    setStatus(t('Téléchargement…'));
     try {
       await share(f.name, f.url);
       setStatus(null);
     } catch (e) {
-      setStatus(`Échec du partage : ${errMsg(e)}`);
+      setStatus(t('Échec du partage : {error}', { error: errMsg(e) }));
     } finally {
       setSaving(false);
     }
@@ -149,20 +150,20 @@ export default function ViewerScreen() {
         setIndex(Math.min(index, rest.length - 1));
         setStatus(null);
       },
-      (e) => setStatus(`Échec de la suppression : ${errMsg(e)}`),
+      (e) => setStatus(t('Échec de la suppression : {error}', { error: errMsg(e) })),
     );
 
   const confirmRemove = () =>
-    Alert.alert(`Supprimer ${what} ?`, 'Elle sera effacée de la carte SD.', [
-      { text: 'Annuler', style: 'cancel' },
-      { text: 'Supprimer', style: 'destructive', onPress: remove },
+    Alert.alert(t(f.isVideo ? 'Supprimer la vidéo ?' : 'Supprimer la photo ?'), t('Elle sera effacée de la carte SD.'), [
+      { text: t('Annuler'), style: 'cancel' },
+      { text: t('Supprimer'), style: 'destructive', onPress: remove },
     ]);
 
   return (
     <>
       <Stack.Screen
         options={{
-          title: formatCamTime(f.time),
+          title: formatCamTime(f.time, locale()),
           headerTintColor: V.label,
           headerShadowVisible: false,
           headerTitleStyle: { color: V.label },
@@ -172,7 +173,7 @@ export default function ViewerScreen() {
           // Stack.Toolbar is iOS-only: Android gets its Close button here.
           headerLeft: Platform.OS === 'android'
             ? () => (
-                <Pressable onPress={() => router.back()} hitSlop={8} style={s.androidBtn} accessibilityRole="button" accessibilityLabel="Fermer">
+                <Pressable onPress={() => router.back()} hitSlop={8} style={s.androidBtn} accessibilityRole="button" accessibilityLabel={t('Fermer')}>
                   <SymbolView name={{ ios: 'xmark', android: 'close' }} size={24} tintColor={V.label} />
                 </Pressable>
               )
@@ -183,16 +184,16 @@ export default function ViewerScreen() {
       <>
       <Stack.Toolbar placement="left" tintColor={V.label}>
         {/* Standard Close button for a modal view (HIG › Toolbars: "Use the standard Back and Close buttons") */}
-        <Stack.Toolbar.Button icon="xmark" onPress={() => router.back()} accessibilityLabel="Fermer" />
+        <Stack.Toolbar.Button icon="xmark" onPress={() => router.back()} accessibilityLabel={t('Fermer')} />
       </Stack.Toolbar>
       {/* iOS: native bottom toolbar. Delete confirms through a native menu, like Photos. */}
       <Stack.Toolbar placement="bottom" tintColor={V.label}>
-        <Stack.Toolbar.Button icon="square.and.arrow.up" onPress={shareFile} disabled={saving} accessibilityLabel="Partager" />
+        <Stack.Toolbar.Button icon="square.and.arrow.up" onPress={shareFile} disabled={saving} accessibilityLabel={t('Partager')} />
         <Stack.Toolbar.Spacer />
-        <Stack.Toolbar.Button icon="square.and.arrow.down" onPress={save} disabled={saving} accessibilityLabel="Enregistrer dans Photos" />
+        <Stack.Toolbar.Button icon="square.and.arrow.down" onPress={save} disabled={saving} accessibilityLabel={t('Enregistrer dans Photos')} />
         <Stack.Toolbar.Spacer />
-        <Stack.Toolbar.Menu icon="trash" accessibilityLabel="Supprimer">
-          <Stack.Toolbar.MenuAction icon="trash" destructive onPress={remove}>{`Supprimer ${what}`}</Stack.Toolbar.MenuAction>
+        <Stack.Toolbar.Menu icon="trash" accessibilityLabel={t('Supprimer')}>
+          <Stack.Toolbar.MenuAction icon="trash" destructive onPress={remove}>{t(f.isVideo ? 'Supprimer la vidéo' : 'Supprimer la photo')}</Stack.Toolbar.MenuAction>
         </Stack.Toolbar.Menu>
       </Stack.Toolbar>
       </>
@@ -221,7 +222,7 @@ export default function ViewerScreen() {
                   source={{ uri: item.isVideo ? cachedThumb(item) : item.url }}
                   style={{ flex: 1 }}
                   resizeMode="contain"
-                  accessibilityLabel={`${item.isVideo ? 'Vidéo' : 'Photo'}, ${formatCamTime(item.time)}`}
+                  accessibilityLabel={t(item.isVideo ? 'Vidéo, {date}' : 'Photo, {date}', { date: formatCamTime(item.time, locale()) })}
                 />
               )}
             </View>
@@ -238,7 +239,7 @@ export default function ViewerScreen() {
           ) : (
             <View style={s.meta}>
               {f.isVideo && (
-                <View style={s.metaItem} accessibilityLabel={`Durée ${durations[f.path] ? mmss(durations[f.path]) : 'inconnue'}`}>
+                <View style={s.metaItem} accessibilityLabel={durations[f.path] ? t('Durée {d}', { d: mmss(durations[f.path]) }) : t('Durée inconnue')}>
                   <SymbolView name={{ ios: 'clock', android: 'schedule' }} size={13 * window.fontScale} tintColor={V.secondary} />
                   <Text style={[s.metaText, s.tabular, { color: V.secondary }]}>{durations[f.path] ? mmss(durations[f.path]) : '–:––'}</Text>
                 </View>
@@ -247,19 +248,19 @@ export default function ViewerScreen() {
                 <SymbolView name={{ ios: 'internaldrive', android: 'sd_card' }} size={13 * window.fontScale} tintColor={V.secondary} />
                 <Text style={[s.metaText, { color: V.secondary }]}>{mo(f.size)}</Text>
               </View>
-              <Text style={[s.metaText, s.tabular, s.position, { color: V.secondary }]}>{`${index + 1} sur ${files.length}`}</Text>
+              <Text style={[s.metaText, s.tabular, s.position, { color: V.secondary }]}>{t('{i} sur {n}', { i: index + 1, n: files.length })}</Text>
             </View>
           )}
         </View>
         {Platform.OS === 'android' && (
           <View style={s.androidBar}>
-            <Pressable onPress={shareFile} disabled={saving} style={s.androidBtn} accessibilityRole="button" accessibilityLabel="Partager">
+            <Pressable onPress={shareFile} disabled={saving} style={s.androidBtn} accessibilityRole="button" accessibilityLabel={t('Partager')}>
               <SymbolView name={{ ios: 'square.and.arrow.up', android: 'share' }} size={24} tintColor={V.label} />
             </Pressable>
-            <Pressable onPress={save} disabled={saving} style={s.androidBtn} accessibilityRole="button" accessibilityLabel="Télécharger">
+            <Pressable onPress={save} disabled={saving} style={s.androidBtn} accessibilityRole="button" accessibilityLabel={t('Télécharger')}>
               <SymbolView name={{ ios: 'square.and.arrow.down', android: 'download' }} size={24} tintColor={V.label} />
             </Pressable>
-            <Pressable onPress={confirmRemove} style={s.androidBtn} accessibilityRole="button" accessibilityLabel="Supprimer">
+            <Pressable onPress={confirmRemove} style={s.androidBtn} accessibilityRole="button" accessibilityLabel={t('Supprimer')}>
               <SymbolView name={{ ios: 'trash', android: 'delete' }} size={24} tintColor={V.label} />
             </Pressable>
           </View>

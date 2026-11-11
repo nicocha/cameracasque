@@ -1,0 +1,6 @@
+{
+    "ios": {
+        "NSLocalNetworkUsageDescription": "Connexion à votre caméra Cambox sur son réseau WiFi.",
+        "NSPhotoLibraryAddUsageDescription": "Enregistrer les photos et vidéos de la caméra dans votre galerie."
+    }
+}

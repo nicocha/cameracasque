@@ -1,0 +1,6 @@
+{
+    "ios": {
+        "NSLocalNetworkUsageDescription": "Connects to your Cambox camera on its Wi-Fi network.",
+        "NSPhotoLibraryAddUsageDescription": "Saves the camera’s photos and videos to your library."
+    }
+}

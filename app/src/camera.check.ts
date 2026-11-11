@@ -56,3 +56,30 @@ assert.ok('options' in res4('cbv4pro') && res4('cbv4pro').options[0].label === '
 const odd = sectionsV4('cbv4pro', { resolution: '2', framerate: '1' })[0].items[0];
 assert.ok('options' in odd && odd.options.at(-1)!.label === '720p 120 i/s'); // unknown combo stays selectable
 console.log('ok v4');
+
+// i18n (i18n.ts): generated labels, and an English entry for every French text the app shows.
+const { t, setLang, EN } = await import('./i18n.ts');
+const { readFileSync, readdirSync } = await import('node:fs');
+setLang('en');
+assert.equal(t('4K 30 i/s'), '4K 30 fps');
+assert.equal(t('12 Mpx'), '12 MP');
+assert.equal(t('10 (par défaut)'), '10 (default)');
+assert.equal(t(batteryV4(3600)), '50% (3.60 V)');
+assert.equal(t('Supprimer {n} éléments ?', { n: 3 }), 'Delete 3 items?');
+assert.equal(t('Fluorescent 1'), 'Fluorescent 1'); // no entry: unchanged
+assert.equal(dateRange(d('2026/10/17 09:00:00'), d('2026/10/12 18:00:00'), 'en-GB'), '12 – 17 Oct 2026');
+// Camera settings: every title, label, option and footer is translated, except what reads the same in English.
+const same = /^([-+\d.\/ ]+(min|s|M|Hz|photos?)?|Auto|WDR|Max|Min|VGA|Fluorescent( \d)?|Incandescent|ISO( \w+)?|—)$/;
+const shown = [settingsFor(true), settingsFor(false), sectionsV4('cbv4'), sectionsV4('cbv4pro')].flat()
+  .flatMap((sec) => [sec.title, sec.footer ?? '', ...sec.items.flatMap((it) => [it.label, ...('options' in it ? it.options.map((o) => o.label) : [])])])
+  .filter(Boolean);
+assert.deepEqual([...new Set(shown)].filter((x) => t(x) === x && EN[x] !== x && !same.test(x)), []);
+// Screens: the literals passed to t() and plural(), and the confirmation texts.
+const files = (readdirSync(import.meta.dirname, { recursive: true }) as string[]).filter((f) => /\.tsx?$/.test(f) && !f.includes('check'));
+const keys = files.flatMap((f) => readFileSync(`${import.meta.dirname}/${f}`, 'utf8').split('\n')
+  .filter((l) => /\b(t|plural)\(|^\s*\d{4}: \[/.test(l))
+  .flatMap((l) => [...l.slice(l.search(/\b(t|plural)\(|\[/)).matchAll(/(?<=[(?:,] ?)(['"])((?:(?!\1).)*[A-Za-zÀ-ÿ]{2}(?:(?!\1).)*)\1/g)].map((m) => m[2])));
+const ignored = /^(ios|android|cancel|destructive|button|auto|fr|en|default|confirm|ssid|password|record\.circle|fiber_manual_record|\/settings\/help|fr-FR|en-GB|utf8|Français|English|hierarchical|primary)$/;
+assert.deepEqual([...new Set(keys)].filter((k) => !ignored.test(k) && !(k in EN)), []);
+setLang('fr');
+console.log('ok i18n');

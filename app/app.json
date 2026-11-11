@@ -65,7 +65,19 @@
             "expo-sharing",
             "expo-status-bar",
             "expo-video",
-            ["./plugins/withAndroidLabel", "Caméra Casque"]
+            [
+                "./plugins/withAndroidLabel",
+                "Caméra Casque"
+            ],
+            [
+                "expo-localization",
+                {
+                    "supportedLocales": [
+                        "fr",
+                        "en"
+                    ]
+                }
+            ]
         ],
         "scheme": "cambox",
         "extra": {
@@ -78,6 +90,10 @@
                 "projectId": "271819ba-1d16-4ef9-9def-eb04644c9002"
             }
         },
-        "owner": "nicocha"
+        "owner": "nicocha",
+        "locales": {
+            "fr": "./locales/fr.json",
+            "en": "./locales/en.json"
+        }
     }
 }

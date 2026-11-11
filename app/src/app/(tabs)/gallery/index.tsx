@@ -18,12 +18,15 @@ import { SymbolView } from "expo-symbols";
 import * as Haptics from "expo-haptics";
 import { CamFile, dateRange, formatCamTime as formatDate, parseCamTime } from "../../../camera";
 import { browsing, DENIED_MSG, photosAllowed, saveToPhotos, share, videoThumb } from "../../../media";
-import { errMsg, NotConnected, sideBarWidth, Unavailable, useCamera, useColors } from "../../../shared";
+import { locale, t } from "../../../i18n";
+import { errMsg, NotConnected, sideBarWidth, Unavailable, useCamera, useColors, useLang } from "../../../shared";
 
-const plural = (n: number, word: string) => `${n} ${word}${n > 1 ? "s" : ""}`;
+// Singular and plural keys of i18n.ts, e.g. "{n} élément enregistré…" / "{n} éléments enregistrés…".
+const plural = (n: number, one: string, many: string) => t(n > 1 ? many : one, { n });
 
 // Like Photos: oldest first, opens scrolled to the newest, title = period of the visible items.
 export default function GalleryScreen() {
+    useLang();
     const { online, driver, recording } = useCamera();
     const c = useColors();
     const window = useWindowDimensions();
@@ -74,7 +77,7 @@ export default function GalleryScreen() {
     // Stable ref required by FlatList.
     const onViewable = useRef(({ viewableItems }: { viewableItems: { item: CamFile }[] }) => {
         const times = viewableItems.map((v) => parseCamTime(v.item.time)).filter((d) => !isNaN(+d));
-        if (times.length) setRange(dateRange(times[0], times[times.length - 1]));
+        if (times.length) setRange(dateRange(times[0], times[times.length - 1], locale()));
     }).current;
 
     const exitSelection = () => {
@@ -98,32 +101,32 @@ export default function GalleryScreen() {
 
     // One file at a time: the camera's HTTP server copes with a single request, not bursts.
     const saveSelected = async () => {
-        if (!(await photosAllowed())) return Alert.alert("Enregistrement impossible", DENIED_MSG);
+        if (!(await photosAllowed())) return Alert.alert(t("Enregistrement impossible"), t(DENIED_MSG));
         const items = chosen();
         let failed = 0;
         for (const [i, f] of items.entries()) {
-            setStatus(`Enregistrement ${i + 1} sur ${items.length}…`);
+            setStatus(t("Enregistrement {i} sur {n}…", { i: i + 1, n: items.length }));
             await saveToPhotos(f.name, f.url).catch(() => failed++);
         }
         exitSelection();
         if (failed) {
             setStatus(null);
-            Alert.alert("Enregistrement incomplet", `${plural(failed, "élément")} n’a pas pu être enregistré.`);
+            Alert.alert(t("Enregistrement incomplet"), plural(failed, "{n} élément n’a pas pu être enregistré.", "{n} éléments n’ont pas pu être enregistrés."));
         } else {
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-            flash(`${plural(items.length, "élément")} enregistré${items.length > 1 ? "s" : ""} dans Photos`);
+            flash(plural(items.length, "{n} élément enregistré dans Photos", "{n} éléments enregistrés dans Photos"));
         }
     };
 
     const shareSelected = async () => {
         const [f] = chosen();
-        setStatus("Préparation du partage…");
+        setStatus(t("Préparation du partage…"));
         try {
             await share(f.name, f.url);
             setStatus(null);
         } catch (e) {
             setStatus(null);
-            Alert.alert("Partage impossible", errMsg(e));
+            Alert.alert(t("Partage impossible"), errMsg(e));
         }
     };
 
@@ -131,18 +134,18 @@ export default function GalleryScreen() {
         const items = chosen();
         let failed = 0;
         for (const [i, f] of items.entries()) {
-            setStatus(`Suppression ${i + 1} sur ${items.length}…`);
+            setStatus(t("Suppression {i} sur {n}…", { i: i + 1, n: items.length }));
             await driver.deleteFile(f).catch(() => failed++);
         }
         setStatus(null);
         exitSelection();
         await load();
-        if (failed) Alert.alert("Suppression incomplète", `${plural(failed, "élément")} n’a pas pu être supprimé.`);
+        if (failed) Alert.alert(t("Suppression incomplète"), plural(failed, "{n} élément n’a pas pu être supprimé.", "{n} éléments n’ont pas pu être supprimés."));
         else Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     };
 
     // No title without a camera (no bar at all on Android, level with the Camera tab); the early states restore it (the main view sets its own).
-    const header = <Stack.Screen options={{ title: online ? "Galerie" : "", headerLargeTitleEnabled: !!online, headerShown: !!online || Platform.OS === "ios" }} />;
+    const header = <Stack.Screen options={{ title: online ? t("Galerie") : "", headerLargeTitleEnabled: !!online, headerShown: !!online || Platform.OS === "ios" }} />;
     if (!online) return <>{header}<NotConnected /></>;
     if (recording)
         return (
@@ -151,17 +154,17 @@ export default function GalleryScreen() {
                     ios: "record.circle",
                     android: "fiber_manual_record",
                 }}
-                title="Enregistrement en cours"
-                message="Arrêtez l’enregistrement dans l’onglet Caméra pour parcourir les fichiers."
+                title={t("Enregistrement en cours")}
+                message={t("Arrêtez l’enregistrement dans l’onglet Caméra pour parcourir les fichiers.")}
             /></>
         );
     if (error && !files)
         return (
             <>{header}<Unavailable
                 symbol={{ ios: "exclamationmark.triangle", android: "warning" }}
-                title="Fichiers indisponibles"
+                title={t("Fichiers indisponibles")}
                 message={error}
-                action={{ label: "Réessayer", onPress: load }}
+                action={{ label: t("Réessayer"), onPress: load }}
             /></>
         );
     if (!files)
@@ -176,9 +179,9 @@ export default function GalleryScreen() {
         status ??
         (selecting
             ? n
-                ? `${n} sélectionné${n > 1 ? "s" : ""}` // short: the toolbar leaves little room
-                : "Sélectionner"
-            : (range ?? "Galerie"));
+                ? plural(n, "{n} sélectionné", "{n} sélectionnés") // short: the toolbar leaves little room
+                : t("Sélectionner")
+            : (range ?? t("Galerie")));
 
     return (
         <>
@@ -188,28 +191,28 @@ export default function GalleryScreen() {
                     headerLargeTitleEnabled: false,
                     // Stack.Toolbar is iOS-only: same actions as header buttons on Android.
                     ...(Platform.OS === "android" && {
-                        headerLeft: selecting ? () => <HeaderIcon name="close" label="Quitter la sélection" onPress={exitSelection} color={c.label} /> : undefined,
+                        headerLeft: selecting ? () => <HeaderIcon name="close" label={t("Quitter la sélection")} onPress={exitSelection} color={c.label} /> : undefined,
                         headerRight: () =>
                             selecting ? (
                                 <View style={s.headerIcons}>
-                                    <HeaderIcon name="share" label="Partager" onPress={shareSelected} disabled={n !== 1 || busy} color={c.label} />
-                                    <HeaderIcon name="download" label="Enregistrer dans la galerie" onPress={saveSelected} disabled={!n || busy} color={c.label} />
+                                    <HeaderIcon name="share" label={t("Partager")} onPress={shareSelected} disabled={n !== 1 || busy} color={c.label} />
+                                    <HeaderIcon name="download" label={t("Enregistrer dans la galerie")} onPress={saveSelected} disabled={!n || busy} color={c.label} />
                                     <HeaderIcon
                                         name="delete"
-                                        label="Supprimer"
+                                        label={t("Supprimer")}
                                         disabled={!n || busy}
                                         color={c.label}
                                         onPress={() =>
-                                            Alert.alert(`Supprimer ${plural(n, "élément")} ?`, "Ils seront effacés de la carte SD.", [
-                                                { text: "Annuler", style: "cancel" },
-                                                { text: "Supprimer", style: "destructive", onPress: removeSelected },
+                                            Alert.alert(plural(n, "Supprimer {n} élément ?", "Supprimer {n} éléments ?"), t("Ils seront effacés de la carte SD."), [
+                                                { text: t("Annuler"), style: "cancel" },
+                                                { text: t("Supprimer"), style: "destructive", onPress: removeSelected },
                                             ])
                                         }
                                     />
                                 </View>
                             ) : (
                                 <Pressable onPress={() => setSelecting(true)} disabled={!files.length} hitSlop={8} style={s.headerText} accessibilityRole="button">
-                                    <Text style={{ color: c.tint, fontSize: 16, fontWeight: "500" }}>Sélectionner</Text>
+                                    <Text style={{ color: c.tint, fontSize: 16, fontWeight: "500" }}>{t("Sélectionner")}</Text>
                                 </Pressable>
                             ),
                     }),
@@ -220,30 +223,30 @@ export default function GalleryScreen() {
             {Platform.OS === "ios" && (
             <>
             <Stack.Toolbar placement="left">
-                <Stack.Toolbar.Button icon="xmark" hidden={!selecting} disabled={busy} onPress={exitSelection} accessibilityLabel="Quitter la sélection" />
+                <Stack.Toolbar.Button icon="xmark" hidden={!selecting} disabled={busy} onPress={exitSelection} accessibilityLabel={t("Quitter la sélection")} />
             </Stack.Toolbar>
             <Stack.Toolbar placement="right">
                 <Stack.Toolbar.Button hidden={selecting} disabled={!files.length} onPress={() => setSelecting(true)}>
-                    Sélectionner
+                    {t("Sélectionner")}
                 </Stack.Toolbar.Button>
                 <Stack.Toolbar.Button
                     icon="square.and.arrow.up"
                     hidden={!selecting}
                     disabled={n !== 1 || busy}
                     onPress={shareSelected}
-                    accessibilityLabel="Partager"
-                    accessibilityHint="Un seul élément à la fois"
+                    accessibilityLabel={t("Partager")}
+                    accessibilityHint={t("Un seul élément à la fois")}
                 />
                 <Stack.Toolbar.Button
                     icon="square.and.arrow.down"
                     hidden={!selecting}
                     disabled={!n || busy}
                     onPress={saveSelected}
-                    accessibilityLabel="Enregistrer dans Photos"
+                    accessibilityLabel={t("Enregistrer dans Photos")}
                 />
-                <Stack.Toolbar.Menu icon="trash" hidden={!selecting} disabled={!n || busy} accessibilityLabel="Supprimer">
+                <Stack.Toolbar.Menu icon="trash" hidden={!selecting} disabled={!n || busy} accessibilityLabel={t("Supprimer")}>
                     <Stack.Toolbar.MenuAction icon="trash" destructive onPress={removeSelected}>
-                        {`Supprimer ${plural(n, "élément")}`}
+                        {plural(n, "Supprimer {n} élément", "Supprimer {n} éléments")}
                     </Stack.Toolbar.MenuAction>
                 </Stack.Toolbar.Menu>
             </Stack.Toolbar>
@@ -273,8 +276,8 @@ export default function GalleryScreen() {
                             ios: "photo.on.rectangle",
                             android: "photo_library",
                         }}
-                        title="Aucun fichier"
-                        message="Les vidéos et photos enregistrées sur la carte SD apparaîtront ici."
+                        title={t("Aucun fichier")}
+                        message={t("Les vidéos et photos enregistrées sur la carte SD apparaîtront ici.")}
                     />
                 }
                 renderItem={({ item }) => {
@@ -293,7 +296,7 @@ export default function GalleryScreen() {
                             }}
                             accessibilityRole="imagebutton"
                             accessibilityState={selecting ? { selected: isSelected } : undefined}
-                            accessibilityLabel={`${item.isVideo ? "Vidéo" : "Photo"}, ${formatDate(item.time)}`}
+                            accessibilityLabel={t(item.isVideo ? "Vidéo, {date}" : "Photo, {date}", { date: formatDate(item.time, locale()) })}
                         >
                             <Thumb file={item} background={c.fill} />
                             {item.isVideo && (

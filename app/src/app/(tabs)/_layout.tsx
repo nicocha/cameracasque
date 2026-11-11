@@ -1,6 +1,9 @@
 import { NativeTabs } from "expo-router/native-tabs";
+import { t } from "../../i18n";
+import { useLang } from "../../shared";
 
 export default function TabsLayout() {
+    useLang();
     return (
         <NativeTabs>
             <NativeTabs.Trigger name="index">
@@ -8,7 +11,7 @@ export default function TabsLayout() {
                     sf={{ default: "camera", selected: "camera.fill" }}
                     md="photo_camera"
                 />
-                <NativeTabs.Trigger.Label>Caméra</NativeTabs.Trigger.Label>
+                <NativeTabs.Trigger.Label>{t("Caméra")}</NativeTabs.Trigger.Label>
             </NativeTabs.Trigger>
             <NativeTabs.Trigger name="gallery">
                 <NativeTabs.Trigger.Icon
@@ -18,9 +21,7 @@ export default function TabsLayout() {
                     }}
                     md="photo_library"
                 />
-                <NativeTabs.Trigger.Label>
-                    Galerie
-                </NativeTabs.Trigger.Label>
+                <NativeTabs.Trigger.Label>{t("Galerie")}</NativeTabs.Trigger.Label>
             </NativeTabs.Trigger>
             <NativeTabs.Trigger name="settings">
                 <NativeTabs.Trigger.Icon
@@ -30,9 +31,7 @@ export default function TabsLayout() {
                     }}
                     md="settings"
                 />
-                <NativeTabs.Trigger.Label>
-                    Réglages
-                </NativeTabs.Trigger.Label>
+                <NativeTabs.Trigger.Label>{t("Réglages")}</NativeTabs.Trigger.Label>
             </NativeTabs.Trigger>
         </NativeTabs>
     );

@@ -1,5 +1,8 @@
 import { Stack } from 'expo-router/stack';
+import { t } from '../../../i18n';
+import { useLang } from '../../../shared';
 
 export default function Layout() {
-  return <Stack screenOptions={{ title: 'Réglages', headerLargeTitleEnabled: true, headerShadowVisible: false }} />;
+  useLang();
+  return <Stack screenOptions={{ title: t('Réglages'), headerLargeTitleEnabled: true, headerShadowVisible: false }} />;
 }

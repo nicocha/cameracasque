@@ -13,6 +13,7 @@ export const STATUS = { recStarted: 8, recStopped: 9, batteryLow: -10 } as const
 
 export const MODE = { photo: 0, video: 1, playback: 2 } as const;
 
+// User-facing text here stays in French: the screens translate it with t() (i18n.ts).
 // Status codes returned by the camera (StateTag.WIFIAPP_RET_*)
 const ERRORS: Record<number, string> = {
   [-10]: 'Batterie faible',
@@ -280,15 +281,15 @@ export const validPassword = (s: string, max = 8) => new RegExp(`^[A-Za-z0-9]{8,
 /** Camera TIME looks like "2024/01/01 12:00:00" (local time). */
 export const parseCamTime = (t: string) => new Date(t.replace(/\//g, '-').replace(' ', 'T'));
 
-export const formatCamTime = (t: string) => {
+export const formatCamTime = (t: string, locale = 'fr-FR') => {
   const d = parseCamTime(t);
-  return isNaN(+d) ? t : d.toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' });
+  return isNaN(+d) ? t : d.toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' });
 };
 
 const DAY: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short', year: 'numeric' };
 /** Photos-style period: "17 oct. 2026", "12 – 17 oct. 2026", "28 sept. – 3 oct. 2026", "30 déc. 2025 – 2 janv. 2026". */
-export function dateRange(a: Date, b: Date) {
-  const fmt = (d: Date, o: Intl.DateTimeFormatOptions) => d.toLocaleDateString('fr-FR', o);
+export function dateRange(a: Date, b: Date, locale = 'fr-FR') {
+  const fmt = (d: Date, o: Intl.DateTimeFormatOptions) => d.toLocaleDateString(locale, o);
   if (a > b) [a, b] = [b, a];
   if (a.toDateString() === b.toDateString()) return fmt(a, DAY);
   const sameYear = a.getFullYear() === b.getFullYear();

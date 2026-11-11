@@ -6,27 +6,31 @@ import { Stack } from 'expo-router';
 import Constants from 'expo-constants';
 import { SymbolView, SymbolViewProps } from 'expo-symbols';
 import { HELP_V3, HELP_V4 } from '../../../help';
+import { HELP_V3_EN, HELP_V4_EN } from '../../../help.en';
+import { t } from '../../../i18n';
 import { v4 } from '../../../camera4';
-import { sideBarWidth, useCamera, useColors } from '../../../shared';
+import { sideBarWidth, useCamera, useColors, useLang } from '../../../shared';
 
 const SITE = 'https://www.cameracasque.fr';
 
 // One manual per family; the connected camera picks the first one shown.
 const MODELS = [
-  { key: 'v3', label: 'Cambox V3+', topics: HELP_V3, source: 'D’après le manuel d’utilisation Cambox V3+ (réf. 232023).' },
-  { key: 'v4', label: 'Cambox V4', topics: HELP_V4, source: 'D’après les notices Cambox V4, V4+ et V4 Pro (2022 et 2024).' },
+  { key: 'v3', label: 'Cambox V3+', topics: { fr: HELP_V3, en: HELP_V3_EN }, source: 'D’après le manuel d’utilisation Cambox V3+ (réf. 232023).' },
+  { key: 'v4', label: 'Cambox V4', topics: { fr: HELP_V4, en: HELP_V4_EN }, source: 'D’après les notices Cambox V4, V4+ et V4 Pro (2022 et 2024).' },
 ] as const;
 
 export default function HelpScreen() {
+  const lang = useLang();
   const c = useColors();
   const { driver } = useCamera();
   const [model, setModel] = useState(driver === v4 ? 1 : 0);
-  const { topics, source } = MODELS[model];
+  const topics = MODELS[model].topics[lang];
+  const source = t(MODELS[model].source);
   const window = useWindowDimensions();
   const side = sideBarWidth(window.width, window.height);
   return (
     <>
-      <Stack.Screen options={{ title: 'Aide' }} />
+      <Stack.Screen options={{ title: t('Aide') }} />
       <ScrollView contentInsetAdjustmentBehavior="automatic" style={{ backgroundColor: c.bg }} contentContainerStyle={[s.content, { paddingRight: 16 + side }]}>
         {/* iOS: the system segmented control. Android: the same choice drawn as Material-style segments. */}
         {Platform.OS === 'ios' ? (

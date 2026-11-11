@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ColorValue, Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { Section, Setting } from '../camera';
+import { t } from '../i18n';
 import { useColors } from '../shared';
 
 export type SettingsFormProps = {
@@ -20,6 +21,7 @@ type Choice = Extract<Setting, { options: unknown }>;
 // Android: Material settings pattern (a list preference). Title with the current value as summary;
 // a tap opens a radio-button dialog. @expo/ui's ListItem squeezed its label to one letter per line
 // as soon as a dropdown sat in the trailing slot. iOS uses SettingsForm.ios.tsx.
+// The drivers' labels are in French: translated here.
 export default function SettingsForm({ sections, values, camera, firmware, battery, actionValues, onSelect, onAction }: SettingsFormProps) {
   const c = useColors();
   const [open, setOpen] = useState<Choice | null>(null);
@@ -43,19 +45,19 @@ export default function SettingsForm({ sections, values, camera, firmware, batte
       <ScrollView style={{ backgroundColor: c.bg }} contentContainerStyle={s.content}>
         {sections.map((sec) => (
           <View key={sec.title} style={s.section}>
-            <Text style={[s.header, { color: c.tint }]} accessibilityRole="header">{sec.title}</Text>
+            <Text style={[s.header, { color: c.tint }]} accessibilityRole="header">{t(sec.title)}</Text>
             {sec.items.map((it) =>
               'options' in it ? (
                 <Row
                   key={it.cmd}
-                  title={it.label}
-                  summary={it.options.find((o) => o.value === values[it.cmd])?.label ?? '—'}
+                  title={t(it.label)}
+                  summary={t(it.options.find((o) => o.value === values[it.cmd])?.label ?? '—')}
                   onPress={() => setOpen(it)}
                 />
               ) : (
                 <Row
                   key={it.cmd}
-                  title={it.label}
+                  title={t(it.label)}
                   summary={actionValues[it.cmd]}
                   color={it.action === 'confirm' ? c.red : undefined}
                   onPress={() => onAction(it)}
@@ -63,22 +65,22 @@ export default function SettingsForm({ sections, values, camera, firmware, batte
               ),
             )}
             {(sec.footer || sec.title === 'WiFi') && (
-              <Text style={[s.footer, { color: c.secondary }]}>{sec.footer ?? 'Après modification, redémarrez la caméra puis rejoignez le nouveau réseau.'}</Text>
+              <Text style={[s.footer, { color: c.secondary }]}>{t(sec.footer ?? 'Après modification, redémarrez la caméra puis rejoignez le nouveau réseau.')}</Text>
             )}
           </View>
         ))}
         <View style={s.section}>
-          <Text style={[s.header, { color: c.tint }]} accessibilityRole="header">Informations</Text>
-          <Row title="Caméra" summary={camera} />
-          <Row title="Batterie" summary={battery} />
-          <Row title="Version du firmware" summary={firmware} />
+          <Text style={[s.header, { color: c.tint }]} accessibilityRole="header">{t('Informations')}</Text>
+          <Row title={t('Caméra')} summary={camera} />
+          <Row title={t('Batterie')} summary={t(battery)} />
+          <Row title={t('Version du firmware')} summary={firmware} />
         </View>
       </ScrollView>
 
       <Modal visible={!!open} transparent animationType="fade" onRequestClose={() => setOpen(null)}>
-        <Pressable style={s.backdrop} onPress={() => setOpen(null)} accessibilityLabel="Fermer">
+        <Pressable style={s.backdrop} onPress={() => setOpen(null)} accessibilityLabel={t('Fermer')}>
           <Pressable style={[s.dialog, { backgroundColor: c.bg }]} onPress={() => {}}>
-            <Text style={[s.dialogTitle, { color: c.label }]}>{open?.label}</Text>
+            <Text style={[s.dialogTitle, { color: c.label }]}>{open && t(open.label)}</Text>
             <ScrollView style={{ flexGrow: 0 }}>
               {open?.options.map((o) => {
                 const selected = values[open.cmd] === o.value;
@@ -97,13 +99,13 @@ export default function SettingsForm({ sections, values, camera, firmware, batte
                     <View style={[s.radio, { borderColor: selected ? c.tint : c.secondary }]}>
                       {selected && <View style={[s.radioDot, { backgroundColor: c.tint }]} />}
                     </View>
-                    <Text style={[s.optionText, { color: c.label }]}>{o.label}</Text>
+                    <Text style={[s.optionText, { color: c.label }]}>{t(o.label)}</Text>
                   </Pressable>
                 );
               })}
             </ScrollView>
             <Pressable onPress={() => setOpen(null)} style={s.cancel} accessibilityRole="button">
-              <Text style={{ color: c.tint, fontSize: 14, fontWeight: '600' }}>Annuler</Text>
+              <Text style={{ color: c.tint, fontSize: 14, fontWeight: '600' }}>{t('Annuler')}</Text>
             </Pressable>
           </Pressable>
         </Pressable>

@@ -9,7 +9,8 @@ import * as Haptics from 'expo-haptics';
 import { SymbolView } from 'expo-symbols';
 import { VLCPlayer } from 'react-native-vlc-media-player';
 import { MODE } from '../../camera';
-import { errMsg, NotConnected, useCamera } from '../../shared';
+import { t } from '../../i18n';
+import { errMsg, NotConnected, useCamera, useLang } from '../../shared';
 
 // The camera leaves preview mode to record (see each driver's `live`): no preview while recording.
 const YELLOW = '#ffd60a'; // Camera app's selected-mode color
@@ -20,6 +21,7 @@ const fitted = (box: { width: number; height: number } | null, r: number) =>
   box ? { width: Math.min(box.width, box.height * r), aspectRatio: r } : { width: '100%' as const, aspectRatio: r };
 
 export default function LiveScreen() {
+  useLang();
   const { online, driver, recording, setRecording } = useCamera();
   const [mode, setMode] = useState<number>(MODE.video); // selected in the UI, not the camera's mode
   const [ready, setReady] = useState(false);
@@ -49,7 +51,7 @@ export default function LiveScreen() {
       let cancelled = false;
       setPreparing(true);
       driver.prepareLive(() => cancelled)
-        .then((ok) => ok && startPreview(), (e) => Alert.alert('Impossible de préparer l’aperçu', errMsg(e)))
+        .then((ok) => ok && startPreview(), (e) => Alert.alert(t('Impossible de préparer l’aperçu'), errMsg(e)))
         .finally(() => setPreparing(false));
       return () => { cancelled = true; setReady(false); };
     }, [online, driver, recording, preview]),
@@ -103,9 +105,9 @@ export default function LiveScreen() {
   const shutter = () => {
     if (locked) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    if (isVideo && recording) run('Arrêt de l’enregistrement impossible', async () => { await driver.stopRecording(); setRecording(false); });
-    else if (isVideo) run('Enregistrement impossible', startRecording);
-    else run('Photo impossible', () => driver.snapshot());
+    if (isVideo && recording) run(t('Arrêt de l’enregistrement impossible'), async () => { await driver.stopRecording(); setRecording(false); });
+    else if (isVideo) run(t('Enregistrement impossible'), startRecording);
+    else run(t('Photo impossible'), () => driver.snapshot());
   };
 
   if (!online) return <NotConnected dark />;
@@ -114,7 +116,7 @@ export default function LiveScreen() {
   const isVideo = mode === MODE.video || !driver.live.photo;
 
   const recPill = recording && (
-    <View style={s.recPill} accessibilityLabel={`Enregistrement en cours, ${mmss}`}>
+    <View style={s.recPill} accessibilityLabel={t('Enregistrement en cours, {time}', { time: mmss })}>
       <Text style={s.recText}>{mmss}</Text>
     </View>
   );
@@ -137,28 +139,28 @@ export default function LiveScreen() {
       )}
       {recording ? (
         <View style={s.failed}>
-          <Text style={s.failedTitle}>Pas d’aperçu pendant l’enregistrement</Text>
+          <Text style={s.failedTitle}>{t('Pas d’aperçu pendant l’enregistrement')}</Text>
         </View>
       ) : busy && isVideo ? (
         <View style={s.failed}>
           <ActivityIndicator color="#fff" />
-          <Text style={s.failedTitle}>Démarrage de l’enregistrement…</Text>
+          <Text style={s.failedTitle}>{t('Démarrage de l’enregistrement…')}</Text>
         </View>
       ) : !preview ? (
         <View style={s.failed}>
-          <Text style={s.failedTitle}>Aperçu désactivé</Text>
+          <Text style={s.failedTitle}>{t('Aperçu désactivé')}</Text>
         </View>
       ) : failed ? (
         <View style={s.failed}>
-          <Text style={s.failedTitle}>Aperçu indisponible</Text>
+          <Text style={s.failedTitle}>{t('Aperçu indisponible')}</Text>
           <Pressable onPress={retry} hitSlop={8} style={s.retryBtn} accessibilityRole="button">
-            <Text style={s.retryText}>Réessayer</Text>
+            <Text style={s.retryText}>{t('Réessayer')}</Text>
           </Pressable>
         </View>
       ) : !playing && (
         <View style={s.failed}>
           <ActivityIndicator color="#fff" />
-          <Text style={s.failedTitle}>Connexion au flux…</Text>
+          <Text style={s.failedTitle}>{t('Connexion au flux…')}</Text>
         </View>
       )}
       {/* A toggle button in the frame's corner, like the Camera app's: filled in yellow while on. */}
@@ -168,7 +170,7 @@ export default function LiveScreen() {
         hitSlop={8}
         style={[s.previewBtn, preview && s.previewOn, (locked || recording) && { opacity: 0.4 }]}
         accessibilityRole="switch"
-        accessibilityLabel="Aperçu"
+        accessibilityLabel={t('Aperçu')}
         accessibilityState={{ checked: preview, disabled: locked || recording }}
       >
         <SymbolView
@@ -195,7 +197,7 @@ export default function LiveScreen() {
               accessibilityState={{ selected, disabled: locked || recording }}
             >
               <Text style={[s.modeText, { color: selected ? YELLOW : '#fff', opacity: recording && !selected ? 0.4 : 1 }]}>
-                {m === MODE.video ? 'VIDÉO' : 'PHOTO'}
+                {m === MODE.video ? t('VIDÉO') : t('PHOTO')}
               </Text>
             </Pressable>
           );
@@ -207,7 +209,7 @@ export default function LiveScreen() {
           disabled={locked}
           style={({ pressed }) => [s.shutterRing, pressed && { opacity: 0.7 }]}
           accessibilityRole="button"
-          accessibilityLabel={isVideo ? (recording ? 'Arrêter l’enregistrement' : 'Enregistrer une vidéo') : 'Prendre une photo'}
+          accessibilityLabel={t(isVideo ? (recording ? 'Arrêter l’enregistrement' : 'Enregistrer une vidéo') : 'Prendre une photo')}
         >
           <View style={[s.shutterCore, isVideo ? s.coreVideo : s.corePhoto, recording && s.coreRecording, locked && { opacity: 0.5 }]} />
         </Pressable>
