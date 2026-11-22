@@ -1,6 +1,7 @@
 import { createContext, ReactNode, useContext, useEffect, useState, useSyncExternalStore } from 'react';
 import { Platform, PlatformColor, Pressable, StyleSheet, Text, useColorScheme, View } from 'react-native';
 import { router } from 'expo-router';
+import { nativeApplicationVersion, nativeBuildVersion } from 'expo-application';
 import { File, Paths } from 'expo-file-system';
 import { getLocales } from 'expo-localization';
 import { SymbolView, SymbolViewProps } from 'expo-symbols';
@@ -136,9 +137,12 @@ export const errMsg = (e: unknown) => {
     : t(m); // the drivers' messages are in French
 };
 
+/** "Caméra Casque 1.0.0 (8)": the store version and the build number EAS assigned. */
+export const appVersion = `Caméra Casque ${nativeApplicationVersion ?? ''} (${nativeBuildVersion ?? '?'})`;
+
 /** Equivalent of UIContentUnavailableConfiguration: symbol, title, explanation. */
-export function Unavailable({ symbol, title, message, dark, action }: {
-  symbol: SymbolViewProps['name']; title: string; message: string; dark?: boolean; action?: { label: string; onPress: () => void };
+export function Unavailable({ symbol, title, message, dark, action, footer }: {
+  symbol: SymbolViewProps['name']; title: string; message: string; dark?: boolean; action?: { label: string; onPress: () => void }; footer?: string;
 }) {
   const system = useColors();
   const c = dark ? palette.dark : system;
@@ -155,6 +159,7 @@ export function Unavailable({ symbol, title, message, dark, action }: {
           <Text style={[s.message, { color: c.tint }]}>{action.label}</Text>
         </Pressable>
       )}
+      {footer && <Text style={[s.footer, { color: c.secondary }]}>{footer}</Text>}
     </View>
   );
 }
@@ -167,6 +172,7 @@ export function NotConnected({ dark }: { dark?: boolean }) {
       title={t('Caméra non connectée')}
       message={t('Rejoignez le réseau WiFi de la caméra dans les Réglages du téléphone.') + (Platform.OS === 'android' ? `\n\n${t('Si la connexion échoue, désactivez les données mobiles.')}` : '')}
       action={{ label: t('Comment connecter la caméra'), onPress: () => router.push('/settings/help') }}
+      footer={appVersion}
     />
   );
 }
@@ -177,4 +183,5 @@ const s = StyleSheet.create({
   title: { fontSize: 22, fontWeight: '700', marginTop: 12, textAlign: 'center' },
   message: { fontSize: 17, textAlign: 'center' },
   action: { minHeight: 44, justifyContent: 'center', marginTop: 8 },
+  footer: { fontSize: 12, marginTop: 24, opacity: 0.8 },
 });

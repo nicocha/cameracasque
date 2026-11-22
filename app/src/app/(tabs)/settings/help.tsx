@@ -3,13 +3,12 @@ import { Linking, Platform, Pressable, ScrollView, StyleSheet, Text, View, useWi
 import { Host, Picker, Text as SwiftText } from '@expo/ui/swift-ui';
 import { pickerStyle, tag } from '@expo/ui/swift-ui/modifiers';
 import { Stack } from 'expo-router';
-import Constants from 'expo-constants';
 import { SymbolView, SymbolViewProps } from 'expo-symbols';
 import { HELP_V3, HELP_V4 } from '../../../help';
 import { HELP_V3_EN, HELP_V4_EN } from '../../../help.en';
 import { t } from '../../../i18n';
 import { v4 } from '../../../camera4';
-import { sideBarWidth, useCamera, useColors, useLang } from '../../../shared';
+import { appVersion, sideBarWidth, useCamera, useColors, useLang } from '../../../shared';
 
 const SITE = 'https://www.cameracasque.fr';
 
@@ -80,7 +79,7 @@ export default function HelpScreen() {
         ))}
         <Text style={[s.source, { color: c.secondary }]}>{source}</Text>
         <View style={s.about}>
-          <Text style={[s.source, { color: c.secondary }]}>Caméra Casque {Constants.expoConfig?.version}</Text>
+          <Text style={[s.source, { color: c.secondary }]}>{appVersion}</Text>
           <Pressable onPress={() => Linking.openURL(SITE)} hitSlop={12} accessibilityRole="link">
             <Text style={[s.link, { color: c.tint }]}>cameracasque.fr</Text>
           </Pressable>
