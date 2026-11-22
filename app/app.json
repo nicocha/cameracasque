@@ -69,6 +69,7 @@
                 "./plugins/withAndroidLabel",
                 "Caméra Casque"
             ],
+            "./plugins/withOptionalPortrait",
             [
                 "expo-localization",
                 {
